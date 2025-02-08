@@ -1,16 +1,9 @@
 import 'dart:convert';
 import 'dart:math';
 
-
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-
-
-
-
-
 
 class ViewNearestNotification extends StatelessWidget {
   const ViewNearestNotification({super.key});
@@ -33,9 +26,7 @@ class ViewNearestNotification extends StatelessWidget {
         primarySwatch: Colors.red,
       ),
       home: const ViewTraficNotificarion(title: 'Flutter Demo Home Page'),
-      routes: {
-
-      },
+      routes: {},
     );
   }
 }
@@ -65,8 +56,6 @@ class _ViewTraficNotificarionState extends State<ViewTraficNotificarion> {
     load();
   }
 
-
-
   List<String> ccid_ = <String>[];
   List<String> notification_ = <String>[];
   List<String> date_ = <String>[];
@@ -75,7 +64,6 @@ class _ViewTraficNotificarionState extends State<ViewTraficNotificarion> {
   // List<String> department_= <String>[];
   // List<String> age_ = <String>[];
   // List<String> gender_ = <String>[];
-
 
   Future<void> load() async {
     List<String> ccid = <String>[];
@@ -87,15 +75,13 @@ class _ViewTraficNotificarionState extends State<ViewTraficNotificarion> {
     // List<String> age = <String>[];
     // List<String> gender = <String>[];
 
-
-
     try {
-      final pref=await SharedPreferences.getInstance();
+      final pref = await SharedPreferences.getInstance();
       // String vid= pref.getString("rid").toString();
-      String ip= pref.getString("url").toString();
+      String ip = pref.getString("url").toString();
       // String lid= pref.getString("lid").toString();
 
-      String url=ip+"view_nearest_traffic_notifivcation";
+      String url = ip + "view_nearest_traffic_notifivcation";
       print(url);
       var data = await http.post(Uri.parse(url), body: {
         // 'rid':vid
@@ -115,7 +101,6 @@ class _ViewTraficNotificarionState extends State<ViewTraficNotificarion> {
       // List<String> type_ = <String>[];
 
       for (int i = 0; i < arr.length; i++) {
-
         ccid.add(arr[i]['id'].toString());
         notification.add(arr[i]['notification'].toString());
         date.add(arr[i]['date'].toString());
@@ -151,29 +136,32 @@ class _ViewTraficNotificarionState extends State<ViewTraficNotificarion> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.redAccent,
-        title: Text(
+      appBar: AppBar(
+        backgroundColor: Colors.blueAccent,
+        title: const Text(
           "Notifications",
           style: TextStyle(color: Colors.white),
         ),
-
       ),
       body: ListView.builder(
         physics: BouncingScrollPhysics(),
         itemCount: ccid_.length,
         itemBuilder: (context, index) {
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
             child: Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              elevation: 4,
+              color: const Color.fromARGB(255, 234, 234, 234),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+              elevation: 0,
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildRow("Notification", notification_[index]),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     _buildRow("Date", date_[index]),
                   ],
                 ),
@@ -206,8 +194,4 @@ class _ViewTraficNotificarionState extends State<ViewTraficNotificarion> {
       ],
     );
   }
-
-
-
-
 }

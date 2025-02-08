@@ -1,21 +1,13 @@
 import 'dart:convert';
 import 'dart:math';
 
-
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:permission_handler/permission_handler.dart';  // Add this for handling runtime permissions
-
-
-
-
-
-
-
+import 'package:permission_handler/permission_handler.dart'; // Add this for handling runtime permissions
 
 class ViewNearestAmbulances extends StatelessWidget {
   const ViewNearestAmbulances({super.key});
@@ -38,9 +30,7 @@ class ViewNearestAmbulances extends StatelessWidget {
         primarySwatch: Colors.red,
       ),
       home: const ViewNearestAmbulancesPage(title: 'Flutter Demo Home Page'),
-      routes: {
-
-      },
+      routes: {},
     );
   }
 }
@@ -60,7 +50,8 @@ class ViewNearestAmbulancesPage extends StatefulWidget {
   final String title;
 
   @override
-  State<ViewNearestAmbulancesPage> createState() => _ViewNearestAmbulancesPageState();
+  State<ViewNearestAmbulancesPage> createState() =>
+      _ViewNearestAmbulancesPageState();
 }
 
 class _ViewNearestAmbulancesPageState extends State<ViewNearestAmbulancesPage> {
@@ -69,8 +60,6 @@ class _ViewNearestAmbulancesPageState extends State<ViewNearestAmbulancesPage> {
   _ViewNearestAmbulancesPageState() {
     load();
   }
-
-
 
   List<String> ccid_ = <String>[];
   List<String> AmbulanceNumber_ = <String>[];
@@ -82,7 +71,6 @@ class _ViewNearestAmbulancesPageState extends State<ViewNearestAmbulancesPage> {
   // List<String> department_= <String>[];
   // List<String> age_ = <String>[];
   // List<String> gender_ = <String>[];
-
 
   Future<void> load() async {
     List<String> ccid = <String>[];
@@ -96,15 +84,13 @@ class _ViewNearestAmbulancesPageState extends State<ViewNearestAmbulancesPage> {
     // List<String> age = <String>[];
     // List<String> gender = <String>[];
 
-
-
     try {
-      final pref=await SharedPreferences.getInstance();
+      final pref = await SharedPreferences.getInstance();
       // String vid= pref.getString("rid").toString();
-      String ip= pref.getString("url").toString();
+      String ip = pref.getString("url").toString();
       // String lid= pref.getString("lid").toString();
 
-      String url=ip+"view_nearest_ambulances";
+      String url = ip + "view_nearest_ambulances";
       print(url);
       var data = await http.post(Uri.parse(url), body: {
         // 'rid':vid
@@ -124,7 +110,6 @@ class _ViewNearestAmbulancesPageState extends State<ViewNearestAmbulancesPage> {
       // List<String> type_ = <String>[];
 
       for (int i = 0; i < arr.length; i++) {
-
         ccid.add(arr[i]['id'].toString());
         AmbulanceNumber.add(arr[i]['Ambulance'].toString());
         Hospital.add(arr[i]['Hospital'].toString());
@@ -155,12 +140,12 @@ class _ViewNearestAmbulancesPageState extends State<ViewNearestAmbulancesPage> {
     }
   }
 
-
   Future<void> openMap(double lat, double lon) async {
     // Check permission before opening the map
     PermissionStatus permissionStatus = await Permission.location.request();
     if (permissionStatus.isGranted) {
-      final Uri googleMapsUrl = Uri.parse("https://www.google.com/maps/search/?api=1&query=$lat,$lon");
+      final Uri googleMapsUrl = Uri.parse(
+          "https://www.google.com/maps/search/?api=1&query=$lat,$lon");
 
       if (await canLaunch(googleMapsUrl.toString())) {
         await launch(googleMapsUrl.toString());
@@ -172,7 +157,6 @@ class _ViewNearestAmbulancesPageState extends State<ViewNearestAmbulancesPage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -182,201 +166,109 @@ class _ViewNearestAmbulancesPageState extends State<ViewNearestAmbulancesPage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-        appBar: AppBar(backgroundColor: Colors.redAccent,
-            title: new Text(
-              "Nearest Ambulances",
-              style: new TextStyle(color: Colors.white),
-            ),
-
+      appBar: AppBar(
+        backgroundColor: Colors.redAccent,
+        title: Text(
+          "Nearest Ambulances",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-
-        body:
-
-
-
-
-        ListView.builder(
-          physics: BouncingScrollPhysics(),
-          // padding: EdgeInsets.all(5.0),
-          // shrinkWrap: true,
-          itemCount: ccid_.length,
-          itemBuilder: (BuildContext context, int index) {
-            return ListTile(
-                onTap: () {
-
-
-
-
-                },
-                title: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Column(
-                    children: [
-
-
-                      Container(
-                        width: MediaQuery. of(context). size. width,
-                        height: 280,
-                        child: Card(
-                          clipBehavior: Clip.antiAliasWithSaveLayer,
-                          child: Column(
-                            children: [
-
-                              SizedBox(height: 16,),
-
-                              Row(
-
-                                children: [
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-
-                                  Flexible(flex: 2, fit: FlexFit.loose, child: Row(children: [Text("Ambulance Number")])),
-                                  Flexible(flex: 3, fit: FlexFit.loose, child: Row(children: [Text(AmbulanceNumber_[index])])),
-
-                                  // Text("Type"),
-                                  // Text(Type_[index])
-                                ],
-                              ),
-
-
-                              SizedBox(height: 16,),Row(
-
-                                children: [
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-
-                                  Flexible(flex: 2, fit: FlexFit.loose, child: Row(children: [Text("Hospital name")])),
-                                  Flexible(flex: 3, fit: FlexFit.loose, child: Row(children: [Text(Hospital_[index])])),
-
-                                  // Text("Status"),
-                                  // Text(Status_[index])
-                                ],
-                              ),
-                              SizedBox(height: 16,),Row(
-
-                                children: [
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-
-                                  Flexible(flex: 2, fit: FlexFit.loose, child: Row(children: [Text("Type")])),
-                                  Flexible(flex: 3, fit: FlexFit.loose, child: Row(children: [Text(Type_[index])])),
-
-                                  // Text("Status"),
-                                  // Text(Status_[index])
-                                ],
-                              ),
-
-                              SizedBox(height: 16,),Row(
-
-                                children: [
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-
-                                  Flexible(flex: 2, fit: FlexFit.loose, child: Row(children: [Text("Latitude")])),
-                                  Flexible(flex: 3, fit: FlexFit.loose, child: Row(children: [Text(Latitude_[index])])),
-
-                                  // Text("Status"),
-                                  // Text(Status_[index])
-                                ],
-                              ),     SizedBox(height: 16,),Row(
-
-                                children: [
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-
-                                  Flexible(flex: 2, fit: FlexFit.loose, child: Row(children: [Text("Longitude")])),
-                                  Flexible(flex: 3, fit: FlexFit.loose, child: Row(children: [Text(Longitude_[index])])),
-
-                                  // Text("Status"),
-                                  // Text(Status_[index])
-                                ],
-                              ),
-                              SizedBox(height: 16,),Row(
-
-                                children: [
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-
-                                  Flexible(flex: 2, fit: FlexFit.loose, child: Row(children: [Text("Status")])),
-                                  Flexible(flex: 3, fit: FlexFit.loose, child: Row(children: [Text(Status_[index])])),
-
-                                  // Text("Status"),
-                                  // Text(Status_[index])
-                                ],
-                              ),
-
-                              ElevatedButton(
-                                onPressed: () {
-                                  openMap(
-                                    double.parse(Latitude_[index]),
-                                    double.parse(Longitude_[index]),
-                                  );
-                                },
-                                child: const Text('Track',style: TextStyle(color: Colors.white),),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.redAccent,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                              ),
-
-
-                              // SizedBox(width: 10.0,),
-                              // ElevatedButton(
-                              //   onPressed: () async {
-                              //
-                              //     SharedPreferences prefs = await SharedPreferences.getInstance();
-                              //     prefs.setString('rid', ccid_[index]);
-                              //
-                              //
-                              //
-                              //     Navigator.push(
-                              //       context,
-                              //
-                              //       MaterialPageRoute(builder: (context) => viewshedule()),
-                              //     );
-                              //
-                              //   },
-                              //   child: Text('VIEW SHEDULE'),
-                              // ),
-
-                            ],
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          elevation: 5,
-                          margin: EdgeInsets.all(10),
+        centerTitle: true,
+        elevation: 4,
+      ),
+      body: ListView.builder(
+        physics: BouncingScrollPhysics(),
+        itemCount: ccid_.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 5,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _infoRow("🚑 Ambulance Number:", AmbulanceNumber_[index]),
+                    Divider(),
+                    _infoRow("🏥 Hospital:", Hospital_[index]),
+                    Divider(),
+                    _infoRow("🛠 Type:", Type_[index]),
+                    Divider(),
+                    _infoRow("📍 Latitude:", Latitude_[index]),
+                    _infoRow("📍 Longitude:", Longitude_[index]),
+                    Divider(),
+                    _statusChip(Status_[index]),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        openMap(
+                          double.parse(Latitude_[index]),
+                          double.parse(Longitude_[index]),
+                        );
+                      },
+                      icon: const Icon(Icons.map, color: Colors.white),
+                      label: const Text("Track"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.redAccent,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-
-
-
-
-
-                    ],
-                  ),
-                )
-
-
-            );
-          },
-
-        )
-
-
-      // This trailing comma makes auto-formatting nicer for build methods.
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 
+  Widget _infoRow(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 15, color: Colors.black54),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-
-
+  Widget _statusChip(String status) {
+    Color chipColor = status == "Available" ? Colors.green : Colors.orange;
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Chip(
+        label: Text(
+          status,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: chipColor,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      ),
+    );
+  }
 }

@@ -23,7 +23,10 @@ class _SendPatientInfoState extends State<SendPatientInfo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Write a New patient_info",style: TextStyle(color: Colors.white),),
+        title: const Text(
+          "Write a New patient_info",
+          style: TextStyle(color: Colors.white),
+        ),
         centerTitle: true,
         backgroundColor: Colors.redAccent,
       ),
@@ -73,7 +76,10 @@ class _SendPatientInfoState extends State<SendPatientInfo> {
                   String status = jasondata['task'].toString();
 
                   if (status == "ok") {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => AmbulanceHome()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AmbulanceHome()));
                   } else {
                     print("error");
                   }
@@ -86,7 +92,10 @@ class _SendPatientInfoState extends State<SendPatientInfo> {
                 ),
                 child: const Text(
                   "Submit patient_info",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,color: Colors.white),
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
               ),
             ),

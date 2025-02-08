@@ -11,6 +11,21 @@ class SendFeedback extends StatefulWidget {
 
 class _SendFeedbackState extends State<SendFeedback> {
   final TextEditingController _feedbackController = TextEditingController();
+  int _selectedEmoji = 3; // Default to neutral
+  final List<String> emojiLabels = [
+    "Very Bad",
+    "Bad",
+    "Neutral",
+    "Good",
+    "Excellent"
+  ];
+  final List<IconData> emojiIcons = [
+    Icons.sentiment_very_dissatisfied,
+    Icons.sentiment_dissatisfied,
+    Icons.sentiment_neutral,
+    Icons.sentiment_satisfied,
+    Icons.sentiment_very_satisfied
+  ];
 
   @override
   void dispose() {
@@ -21,21 +36,64 @@ class _SendFeedbackState extends State<SendFeedback> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Write a New Feedback",style: TextStyle(color: Colors.white),),
+        title: const Text("Feedback", style: TextStyle(color: Colors.black)),
         centerTitle: true,
-        backgroundColor: Colors.redAccent,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.black),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              "We value your feedback! Let us know your thoughts.",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            const Text(
+              "How was your experience with the emergency service?",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              "Your feedback helps us improve ambulance response and efficiency.",
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(emojiIcons.length, (index) {
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedEmoji = index;
+                    });
+                  },
+                  child: Column(
+                    children: [
+                      Icon(
+                        emojiIcons[index],
+                        size: 40,
+                        color: _selectedEmoji == index
+                            ? Colors.orangeAccent
+                            : Colors.grey,
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        emojiLabels[index],
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: _selectedEmoji == index
+                              ? Colors.black
+                              : Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
             ),
             const SizedBox(height: 20),
             Container(
@@ -46,10 +104,10 @@ class _SendFeedbackState extends State<SendFeedback> {
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: TextField(
                 controller: _feedbackController,
-                maxLines: 5,
-                decoration: InputDecoration(
+                maxLines: 4,
+                decoration: const InputDecoration(
                   border: InputBorder.none,
-                  hintText: "Enter your message...",
+                  hintText: "Add a comment...",
                 ),
               ),
             ),
@@ -68,24 +126,28 @@ class _SendFeedbackState extends State<SendFeedback> {
                     Uri.parse(url + "sendfeedback"),
                     body: {'feedback': feedback, 'lid': lid},
                   );
-                  var jasondata = json.decode(data.body);
-                  String status = jasondata['task'].toString();
+                  var jsonData = json.decode(data.body);
+                  String status = jsonData['task'].toString();
 
                   if (status == "ok") {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Home()));
                   } else {
-                    print("error");
+                    print("Error sending feedback");
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.redAccent,
+                  backgroundColor: Colors.blueAccent,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 child: const Text(
-                  "Submit Feedback",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,color: Colors.white),
+                  "Submit Now",
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
               ),
             ),

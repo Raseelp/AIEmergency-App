@@ -13,104 +13,85 @@ class Drawerclass extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: <Widget>[
-          const DrawerHeader(
+      child: Column(
+        children: [
+          const UserAccountsDrawerHeader(
+            accountName: Text("User"),
+            accountEmail: Text("user@example.com"),
+            currentAccountPicture: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Icon(Icons.person, size: 50, color: Colors.blueAccent),
+            ),
             decoration: BoxDecoration(
-              color: Colors.red,
-            ),
-            child: Text(
-              "User",
-              style: TextStyle(color: Colors.white, fontSize: 24),
+              color: Colors.blueAccent,
             ),
           ),
-          ListTile(
-            leading: IconButton(
-              onPressed: () {
-                // Handle icon button press
-              },
-              icon: const Icon(Icons.home),
+          Expanded(
+            child: ListView(
+              children: [
+                _buildDrawerItem(context, Icons.home, "Home", Home()),
+                _buildDrawerItem(context, Icons.local_hospital,
+                    "View Nearest Ambulances", ViewNearestAmbulances()),
+                _buildDrawerItem(context, Icons.notification_important,
+                    "Emergency Alerts", SendAlert()),
+                _buildDrawerItem(context, Icons.traffic,
+                    "Traffic Notifications", ViewNearestNotification()),
+                _buildDrawerItem(
+                    context, Icons.feedback, "Send Feedback", SendFeedback()),
+                Divider(),
+                _buildDrawerItem(context, Icons.logout, "Logout", const login(),
+                    isLogout: true),
+              ],
             ),
-            title: const Text("Home"),
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Home()));
-            },
-          ),
-          ListTile(
-            leading: IconButton(
-                onPressed: () {}, icon: const Icon(Icons.directions_bus)),
-            title: const Text("View Nearest Ambulance Services"),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ViewNearestAmbulances()));
-            },
-          ),
-          ListTile(
-            leading: IconButton(
-                onPressed: () {}, icon: const Icon(Icons.directions_bus)),
-            title: const Text("View Nearest Ambulance alertsss"),
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => SendAlert()));
-            },
-          ),
-          // ListTile(
-          //   leading: IconButton(onPressed: () {}, icon: const Icon(Icons.bus_alert),),
-          //   title: const Text("View Status and info of Selected Ambulance"),
-          //   onTap: () {
-          //     Navigator.push(context, MaterialPageRoute(builder: (context) => ViewStatusSelectedAmbulance()));
-          //
-          //   },
-          // ),
-
-          ListTile(
-            leading: IconButton(
-                onPressed: () {}, icon: const Icon(Icons.book_online)),
-            title: const Text("Traffic Notification"),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ViewNearestNotification()));
-            },
-          ),
-          ListTile(
-            leading:
-                IconButton(onPressed: () {}, icon: const Icon(Icons.feedback)),
-            title: const Text("Send Feedback"),
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => SendFeedback()));
-            },
-          ),
-          //        ListTile(
-          //          leading: IconButton(onPressed: () {}, icon: const Icon(Icons.payment)),
-          //          title: const Text("SCAN QR AND PAY"),
-          //            onTap: () {
-          //              // Navigator.push(context, MaterialPageRoute(builder: (context) => YourScreen()));
-          //
-          //            },
-          //
-          //
-          //
-          // ),
-
-          ListTile(
-            leading:
-                IconButton(onPressed: () {}, icon: const Icon(Icons.logout)),
-            title: const Text("Logout"),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const login()),
-              );
-            },
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDrawerItem(
+    BuildContext context,
+    IconData icon,
+    String title,
+    Widget destination, {
+    bool isLogout = false,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => destination,
+            ));
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          height: 50,
+          decoration: BoxDecoration(
+              color: Colors.blueAccent,
+              borderRadius: BorderRadius.circular(10)),
+          child: Padding(
+            padding: const EdgeInsets.all(
+              8.0,
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  color: Colors.white,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    title,
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
