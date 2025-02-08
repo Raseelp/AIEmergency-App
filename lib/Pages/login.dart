@@ -96,44 +96,36 @@ class _loginState extends State<login> {
                   child: ElevatedButton(
                     onPressed: () async {
                       final sh = await SharedPreferences.getInstance();
-                      String Uname = usernameController.text.trim();
-                      String Passwd = passwordController.text.trim();
+                      String Uname = usernameController.text.toString();
+                      String Passwd = passwordController.text.toString();
                       String url = sh.getString("url").toString();
-
-                      var data = await http.post(
-                        Uri.parse("$url/logincode"),
-                        body: {'username': Uname, "password": Passwd},
-                      );
-                      var jsonData = json.decode(data.body);
-                      String status = jsonData['task'].toString();
-                      String type = jsonData['type'].toString();
-
+                      print("okkkkkkkkkkkkkkkkk");
+                      var data =
+                          await http.post(Uri.parse(url + "logincode"), body: {
+                        'username': Uname,
+                        "password": Passwd,
+                      });
+                      var jasondata = json.decode(data.body);
+                      String status = jasondata['task'].toString();
+                      String type = jasondata['type'].toString();
                       if (status == "valid") {
-                        String lid = jsonData['lid'].toString();
-                        sh.setString("lid", lid);
                         if (type == 'user') {
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Home(),
-                              ));
+                          String lid = jasondata['lid'].toString();
+                          sh.setString("lid", lid);
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) => Home()));
                         } else if (type == 'ambulance') {
-                          Navigator.pushReplacement(
+                          String lid = jasondata['lid'].toString();
+                          sh.setString("lid", lid);
+                          Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => AmbulanceHome(),
-                              ));
+                                  builder: (context) => AmbulanceHome()));
                         } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content:
-                                    Text("Login failed! Please try again.")),
-                          );
+                          print("error");
                         }
                       } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Invalid Credentials!")),
-                        );
+                        print("error");
                       }
                     },
                     style: ElevatedButton.styleFrom(
