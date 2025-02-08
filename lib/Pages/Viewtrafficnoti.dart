@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ViewNearestNotification extends StatelessWidget {
@@ -140,29 +141,59 @@ class _ViewTraficNotificarionState extends State<ViewTraficNotificarion> {
         backgroundColor: Colors.blueAccent,
         title: const Text(
           "Notifications",
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
+        centerTitle: true,
       ),
       body: ListView.builder(
-        physics: BouncingScrollPhysics(),
-        itemCount: ccid_.length,
+        physics: const BouncingScrollPhysics(),
+        itemCount: notification_.length,
         itemBuilder: (context, index) {
           return Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
-            child: Card(
-              color: const Color.fromARGB(255, 234, 234, 234),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-              elevation: 0,
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  const BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 5,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                padding: const EdgeInsets.all(14.0),
+                child: Row(
                   children: [
-                    _buildRow("Notification", notification_[index]),
-                    const SizedBox(height: 10),
-                    _buildRow("Date", date_[index]),
+                    const Icon(Icons.notifications,
+                        color: Colors.redAccent, size: 28),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            notification_[index],
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            formatDate(date_[index]),
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -173,25 +204,12 @@ class _ViewTraficNotificarionState extends State<ViewTraficNotificarion> {
     );
   }
 
-  Widget _buildRow(String label, String value) {
-    return Row(
-      children: [
-        Expanded(
-          flex: 2,
-          child: Text(
-            label,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-        ),
-        Expanded(
-          flex: 3,
-          child: Text(
-            value,
-            style: TextStyle(fontSize: 16),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    );
+  String formatDate(String rawDate) {
+    try {
+      DateTime dateTime = DateTime.parse(rawDate);
+      return DateFormat("MMM dd, yyyy - HH:mm").format(dateTime);
+    } catch (e) {
+      return rawDate;
+    }
   }
 }

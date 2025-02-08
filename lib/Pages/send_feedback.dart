@@ -38,11 +38,11 @@ class _SendFeedbackState extends State<SendFeedback> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Feedback", style: TextStyle(color: Colors.black)),
+        title: const Text("Feedback", style: TextStyle(color: Colors.white)),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.blueAccent,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black),
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),

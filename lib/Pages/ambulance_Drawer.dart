@@ -19,8 +19,8 @@ class AmbulanceDraweClass extends StatelessWidget {
       child: Column(
         children: [
           const UserAccountsDrawerHeader(
-            accountName: Text("User"),
-            accountEmail: Text("user@example.com"),
+            accountName: Text(" Ambulance"),
+            accountEmail: Text("Ambulance@example.com"),
             currentAccountPicture: CircleAvatar(
               backgroundColor: Colors.white,
               child: Icon(Icons.person, size: 50, color: Colors.blueAccent),
@@ -33,8 +33,13 @@ class AmbulanceDraweClass extends StatelessWidget {
             child: ListView(
               children: [
                 _buildDrawerItem(context, Icons.home, "Home", AmbulanceHome()),
-                _buildDrawerItem(context, Icons.local_hospital,
-                    "View Messages From Hospital", ViewAmbulanceMessgae()),
+                _buildDrawerItem(
+                    context,
+                    Icons.local_hospital,
+                    "View Messages From Hospital",
+                    ViewAmbulanceMessgaepagePage(
+                      title: '',
+                    )),
                 _buildDrawerItem(context, Icons.notification_important,
                     "Send Patient Info To Hosptital", SendPatientInfo()),
                 _buildDrawerItem(context, Icons.feedback,

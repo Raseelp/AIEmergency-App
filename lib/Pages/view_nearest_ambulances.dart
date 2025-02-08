@@ -167,7 +167,7 @@ class _ViewNearestAmbulancesPageState extends State<ViewNearestAmbulancesPage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.redAccent,
+        backgroundColor: Colors.blueAccent,
         title: Text(
           "Nearest Ambulances",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),

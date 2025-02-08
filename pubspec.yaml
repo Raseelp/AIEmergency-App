@@ -42,6 +42,7 @@ dependencies:
   permission_handler:
   fluttertoast:
   geolocator:
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
