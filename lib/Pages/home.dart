@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -136,6 +137,12 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        title: const Text(
+          "Emergency SOS",
+          style: TextStyle(
+              color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications, color: Colors.redAccent),
@@ -143,131 +150,145 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
-      drawer: const Drawerclass(), // Drawer integration
+      drawer: const Drawerclass(),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  _currentLocation,
-                  style: const TextStyle(fontSize: 16, color: Colors.grey),
-                ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 20),
 
-                // Emergency Message
-                const Text(
-                  "Are you in emergency?",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  "Press the button below, help will reach you soon.",
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 30),
+              // User Greeting
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Welcome back,",
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                      Text(
+                        "Jenifer Pilman",
+                        style: TextStyle(
+                            fontSize: 22, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  CircleAvatar(
+                    radius: 25,
+                    backgroundColor: Colors.grey[300],
+                    child: Icon(Icons.person, size: 30, color: Colors.white),
+                  ),
+                ],
+              ),
 
-                // SOS Button
-                GestureDetector(
-                  onTap: sendSOSRequest,
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.redAccent.withOpacity(0.4),
-                          blurRadius: 30,
-                          spreadRadius: 10,
+              const SizedBox(height: 30),
+
+              // Emergency Message
+              const Text(
+                "Are you in emergency?",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                "Press the button below, help will reach you soon.",
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 40),
+
+              // SOS Button with Shadow
+              GestureDetector(
+                onTap: sendSOSRequest,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: 160,
+                      height: 160,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: const LinearGradient(
+                          colors: [Colors.redAccent, Colors.deepOrange],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                      ],
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.redAccent.withOpacity(0.5),
+                            blurRadius: 40,
+                            spreadRadius: 10,
+                          ),
+                        ],
+                      ),
                     ),
-                    child: Container(
+                    Container(
                       width: 120,
                       height: 120,
                       decoration: const BoxDecoration(
-                        color: Colors.redAccent,
                         shape: BoxShape.circle,
+                        color: Colors.redAccent,
                       ),
                       child: const Center(
-                        child: Text(
-                          "SOS",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 26,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: FaIcon(FontAwesomeIcons.ambulance,
+                            color: Colors.white, size: 50),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-                const SizedBox(height: 40),
+              ),
 
-                // Current Location Section
-                Container(
-                  padding: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        blurRadius: 5,
-                        spreadRadius: 1,
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      const CircleAvatar(
-                        radius: 22,
-                        // backgroundImage: AssetImage(userProfileImage),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "Your current address",
-                              style: TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              userAddress,
-                              style: const TextStyle(
-                                  fontSize: 14, color: Colors.grey),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+              const SizedBox(height: 50),
+
+              // Current Location Section
+              Container(
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      blurRadius: 5,
+                      spreadRadius: 1,
+                    ),
+                  ],
                 ),
+                child: Row(
+                  children: [
+                    const CircleAvatar(
+                      radius: 25,
+                      backgroundColor: Colors.redAccent,
+                      child: Icon(Icons.location_on, color: Colors.white),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Your Current Address",
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            userAddress,
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
-                const Spacer(),
-
-                // Bottom Navigation
-                // Container(
-                //   padding: const EdgeInsets.symmetric(vertical: 10),
-                //   decoration: BoxDecoration(
-                //     color: Colors.redAccent,
-                //     borderRadius: BorderRadius.circular(15),
-                //   ),
-                //   child: const Row(
-                //     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                //     children: [
-                //       Icon(Icons.home, color: Colors.white, size: 30),
-                //       Icon(Icons.location_on_outlined, color: Colors.white, size: 30),
-                //       Icon(Icons.settings, color: Colors.white, size: 30),
-                //     ],
-                //   ),
-                // ),
-              ],
-            ),
+              const Spacer(),
+            ],
           ),
         ),
       ),

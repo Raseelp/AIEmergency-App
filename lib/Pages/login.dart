@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:emergency_vehicle/Pages/ambulance_home.dart';
+import 'package:emergency_vehicle/Pages/registration.dart';
 import 'package:flutter/material.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -148,7 +149,11 @@ class _loginState extends State<login> {
                 // Registration Button
                 TextButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, "/register");
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Registration(),
+                        ));
                   },
                   child: const Text(
                     "Don't have an account? Register",

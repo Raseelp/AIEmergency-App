@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-
 import 'package:flutter/material.dart';
 import 'dart:io';
 
@@ -30,20 +29,18 @@ class _RegistrationState extends State<Registration> {
   String? selectedGender;
   final _formKey = GlobalKey<FormState>(); // Add a global key for the form
 
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          title: const Text("KSRTC App"),
+          title: const Text("Emergency"),
         ),
         body: SafeArea(
-            child:Form(
-                key: _formKey, child: SingleChildScrollView(
-                child: Column(children: [
+            child: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                    child: Column(children: [
                   const Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Align(
@@ -58,7 +55,6 @@ class _RegistrationState extends State<Registration> {
                       ),
                     ),
                   ),
-
                   Padding(
                     padding: EdgeInsets.all(8.0),
                     child: TextFormField(
@@ -76,28 +72,28 @@ class _RegistrationState extends State<Registration> {
                       },
                     ),
                   ),
+                  // Padding(
+                  //   padding: EdgeInsets.all(8.0),
+                  //   child: TextFormField(
+                  //     controller: lnameController,
+                  //     decoration: InputDecoration(
+                  //       fillColor: Colors.white,
+                  //       border: OutlineInputBorder(),
+                  //       hintText: "Last Name",
+                  //     ),
+                  //     validator: (value) {
+                  //       if (value!.isEmpty) {
+                  //         return 'Please enter your last name';
+                  //       }
+                  //       return null; // Return null if the input is valid
+                  //     },
+                  //   ),
+                  // ),
                   Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      controller: lnameController,
-                      decoration: InputDecoration(
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(),
-                        hintText: "Last Name",
-                      ),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Please enter your last name';
-                        }
-                        return null; // Return null if the input is valid
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
                       controller: placeController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         fillColor: Colors.white,
                         border: OutlineInputBorder(),
                         hintText: "place",
@@ -127,7 +123,6 @@ class _RegistrationState extends State<Registration> {
                       },
                     ),
                   ),
-
                   Padding(
                     padding: EdgeInsets.all(8.0),
                     child: TextFormField(
@@ -195,64 +190,77 @@ class _RegistrationState extends State<Registration> {
                             return 'Please enter your password';
                           }
                           return null; // Return null if the input is valid
-                        },)), Padding(
+                        },
+                      )),
+                  Padding(
                     padding: EdgeInsets.all(8.0),
                     child: ElevatedButton.icon(
                       onPressed: () async {
-                        if(!_formKey.currentState!.validate())
-                        {print("vvvvvvvvvvvvvvvvvvv");}
-                        else{
+                        if (!_formKey.currentState!.validate()) {
+                          print("vvvvvvvvvvvvvvvvvvv");
+                        } else {
                           final sh = await SharedPreferences.getInstance();
-                          String fname=fnameController.text.toString();
-                          String lname=lnameController.text.toString();
-                          String place=placeController.text.toString();
-                          String post=postController.text.toString();
-                          String pin=pinController.text.toString();
-                          String phone=phoneController.text.toString();
-                          String email=emailController.text.toString();
-                          String uname=usernameController.text.toString();
-                          String pasword=passwordController.text.toString();
-                       
+                          String fname = fnameController.text.toString();
+                          // String lname = lnameController.text.toString();
+                          String place = placeController.text.toString();
+                          String post = postController.text.toString();
+                          String pin = pinController.text.toString();
+                          String phone = phoneController.text.toString();
+                          String email = emailController.text.toString();
+                          String uname = usernameController.text.toString();
+                          String pasword = passwordController.text.toString();
 
                           String url = sh.getString("url").toString();
                           print("okkkkkkkkkkkkkkkkk");
                           var data = await http.post(
-                              Uri.parse(url+"registrationcode"),
-                              body: {'fname':fname,
-                                'lname':lname,
-                                'place':place,
-                                'post':post,
-                                'pin':pin,
-                                'phone':phone,
-                                'email':email,
-                                'uname':uname,
-                                'password':pasword,
-                                'lid':sh.getString("lid").toString(),
+                              Uri.parse(url + "user_registration"),
+                              body: {
+                                'fname': fname,
+                                // 'lname': lname,
+                                'place': place,
+                                'post': post,
+                                'pin': pin,
+                                'phone': phone,
+                                'email': email,
+                                'uname': uname,
+                                'password': pasword,
+                                'lid': sh.getString("lid").toString(),
                               });
                           var jasondata = json.decode(data.body);
-                          String status=jasondata['task'].toString();
-                          if(status=="valid")
-                          {
+                          String status = jasondata['task'].toString();
+                          print(status);
+                          if (status == "valid") {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: const Text(
+                                    "Registration Successful! You can now log in."),
+                                backgroundColor: Colors.green,
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
 
-                              Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => login()));
-
-                          }
-                          else{
+                            Future.delayed(const Duration(seconds: 1), () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => login()),
+                              );
+                            });
+                          } else {
                             print("error");
-
-                          }}
-
+                          }
+                        }
                       },
-                      icon: Icon(Icons.send),
-                      label: Text('Submit'),
+                      icon: const Icon(Icons.send),
+                      label: const Text('Submit'),
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all<Color>(
-                          Color(0xFF6ADC50), // Use a proper color value (e.g., Hex or RGB)
+                          Color(
+                              0xFF6ADC50), // Use a proper color value (e.g., Hex or RGB)
                         ),
                       ),
                     ),
-                  )])))
-        ));
+                  )
+                ])))));
   }
 }
