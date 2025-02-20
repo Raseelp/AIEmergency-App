@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'package:emergency_vehicle/widgets/map_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -19,51 +22,13 @@ class _HomeState extends State<Home> {
   String userAddress = "151-171 Montclair Ave, Newark, NJ 07104, USA";
   // String userProfileImage = "assets/profile.jpg"; // Replace with actual image
   String? selectedAlert;
-  String _currentLocation = "Press the button to get the location";
+  String _currentLocationStatus = "Press the button to get the location";
   double? _latitude;
   double? _longitude;
-
-  // Future<void> alert() async {
-  //     if (_latitude == null || _longitude == null) {
-  //       Fluttertoast.showToast(msg: "Please fetch your location first.");
-  //       return;
-  //     }
-  //
-  //     final sh = await SharedPreferences.getInstance();
-  //     String url = sh.getString("url").toString();
-  //     try {
-  //       var data = await http.post(
-  //         Uri.parse(url + "user_send_ambulance_request"),
-  //         body: {
-  //           'lid': sh.getString("lid").toString(),
-  //           // 'alert': selectedAlert,
-  //           'latitude': _latitude.toString(),
-  //           'longitude': _longitude.toString(),
-  //         },
-  //       );
-  //       var jsonData = json.decode(data.body);
-  //       String status = jsonData['status'].toString();
-  //
-  //       if (status == "ok") {
-  //         Fluttertoast.showToast(msg: "Alert Sent!");
-  //         // Navigator.push(
-  //         //   context,
-  //         //   MaterialPageRoute(
-  //         //     builder: (context) => Homepage(),
-  //         //   ),
-  //         // );
-  //       } else {
-  //         // _showAlertDialog("Sending alert failed.");
-  //       }
-  //     } catch (e) {
-  //       print(e);
-  //       // _showAlertDialog("An error occurred: $e");
-  //     }
-  //
-  // }
+  final MapController _mapController = MapController();
+  LatLng? currentLocation = LatLng(11.2588, 75.7804);
 
   Future<void> sendSOSRequest() async {
-
     SharedPreferences sh = await SharedPreferences.getInstance();
     String? url = sh.getString('url'); // Keep null safety handling
     String? lid = sh.getString('lid');
@@ -82,7 +47,6 @@ class _HomeState extends State<Home> {
 
     try {
       final response = await http.post(requestUrl, body: {
-
         'lid': lid,
         'latitude': _latitude.toString(),
         'longitude': _longitude.toString(),
@@ -108,7 +72,7 @@ class _HomeState extends State<Home> {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
           setState(() {
-            _currentLocation = 'Location permissions are denied';
+            _currentLocationStatus = 'Location permissions are denied';
           });
           return;
         }
@@ -116,28 +80,74 @@ class _HomeState extends State<Home> {
 
       if (permission == LocationPermission.deniedForever) {
         setState(() {
-          _currentLocation = 'Location permissions are permanently denied';
+          _currentLocationStatus =
+              'Location permissions are permanently denied';
         });
         return;
       }
-
       Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
-      _latitude = position.latitude;
-      _longitude = position.longitude;
 
       setState(() {
-        _currentLocation = 'Latitude: $_latitude, Longitude: $_longitude';
+        currentLocation = LatLng(position.latitude, position.longitude);
+        _mapController.move(currentLocation!, 14.0);
+        print(currentLocation ?? '1' + 'issomethinff njfnj');
+      });
+
+      // _latitude = position.latitude;
+      // _longitude = position.longitude;
+
+      setState(() {
+        _currentLocationStatus = currentLocation.toString();
       });
     } catch (e) {
       setState(() {
-        _currentLocation = 'Unable to fetch location: $e';
+        _currentLocationStatus = 'Unable to fetch location: $e';
+        print(_currentLocationStatus);
       });
     }
   }
 
+  // Future<void> _getCurrentLocation() async {
+  //   try {
+  //     LocationPermission permission = await Geolocator.checkPermission();
+
+  //     if (permission == LocationPermission.denied) {
+  //       permission = await Geolocator.requestPermission();
+  //       if (permission == LocationPermission.denied) {
+  //         setState(() {
+  //           _currentLocation = 'Location permissions are denied';
+  //         });
+  //         return;
+  //       }
+  //     }
+
+  //     if (permission == LocationPermission.deniedForever) {
+  //       setState(() {
+  //         _currentLocation = 'Location permissions are permanently denied';
+  //       });
+  //       return;
+  //     }
+
+  //     Position position = await Geolocator.getCurrentPosition(
+  //         desiredAccuracy: LocationAccuracy.high);
+  //     _latitude = position.latitude;
+  //     _longitude = position.longitude;
+
+  //     setState(() {
+  //       _currentLocation = 'Latitude: $_latitude, Longitude: $_longitude';
+  //     });
+  //   } catch (e) {
+  //     setState(() {
+  //       _currentLocation = 'Unable to fetch location: $e';
+  //     });
+  //   }
+
+  // }
   @override
   Widget build(BuildContext context) {
+    final screenheight = MediaQuery.of(context).size.height;
+    final screenwidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -163,17 +173,17 @@ class _HomeState extends State<Home> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 20),
-              const SizedBox(height: 20),
-              Text(
-                _currentLocation,
-                style: const TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: _getCurrentLocation,
-                child: const Text("Get Current Location"),
-              ),
+              // const SizedBox(height: 20),
+              // const SizedBox(height: 20),
+              // Text(
+              //   _currentLocation,
+              //   style: const TextStyle(fontSize: 16, color: Colors.grey),
+              // ),
+              // const SizedBox(height: 10),
+              // ElevatedButton(
+              //   onPressed: _getCurrentLocation,
+              //   child: const Text("Get Current Location"),
+              // ),
 
               // User Greeting
               Row(
@@ -260,53 +270,57 @@ class _HomeState extends State<Home> {
                   ],
                 ),
               ),
+              UserMap(
+                  getcurrentLocation: _getCurrentLocation(),
+                  height: screenheight * 0.3,
+                  width: screenwidth * 0.8,
+                  mapController: MapController(),
+                  currentLocation: currentLocation),
 
-              const SizedBox(height: 50),
+              // // Current Location Section
+              // Container(
+              //   padding: const EdgeInsets.all(15),
+              //   decoration: BoxDecoration(
+              //     color: Colors.white,
+              //     borderRadius: BorderRadius.circular(12),
+              //     boxShadow: [
+              //       BoxShadow(
+              //         color: Colors.grey.withOpacity(0.2),
+              //         blurRadius: 5,
+              //         spreadRadius: 1,
+              //       ),
+              //     ],
+              //   ),
+              //   child: Row(
+              //     children: [
+              //       const CircleAvatar(
+              //         radius: 25,
+              //         backgroundColor: Colors.redAccent,
+              //         child: Icon(Icons.location_on, color: Colors.white),
+              //       ),
+              //       const SizedBox(width: 12),
+              //       Expanded(
+              //         child: Column(
+              //           crossAxisAlignment: CrossAxisAlignment.start,
+              //           children: [
+              //             const Text(
+              //               "Your Current Address",
+              //               style: TextStyle(
+              //                   fontSize: 14, fontWeight: FontWeight.bold),
+              //             ),
+              //             Text(
+              //               userAddress,
+              //               style: const TextStyle(
+              //                   fontSize: 14, color: Colors.grey),
+              //             ),
+              //           ],
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
 
-              // Current Location Section
-              Container(
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      blurRadius: 5,
-                      spreadRadius: 1,
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    const CircleAvatar(
-                      radius: 25,
-                      backgroundColor: Colors.redAccent,
-                      child: Icon(Icons.location_on, color: Colors.white),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Your Current Address",
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            userAddress,
-                            style: const TextStyle(
-                                fontSize: 14, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const Spacer(),
+              // const Spacer(),
             ],
           ),
         ),

@@ -37,8 +37,8 @@ class Drawerclass extends StatelessWidget {
                     "Emergency Alerts", SendAlert()),
                 _buildDrawerItem(context, Icons.traffic,
                     "Traffic Notifications", ViewNearestNotification()),
-                _buildDrawerItem(context, Icons.feedback, "Send Feedback",
-                    ShowMapInsideApp()),
+                _buildDrawerItem(
+                    context, Icons.feedback, "Send Feedback", SendFeedback()),
                 Divider(),
                 _buildDrawerItem(context, Icons.logout, "Logout", const login(),
                     isLogout: true),
