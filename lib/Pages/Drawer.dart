@@ -1,6 +1,7 @@
 import 'package:emergency_vehicle/Pages/send%20alert.dart';
 import 'package:emergency_vehicle/Pages/send_feedback.dart';
 import 'package:emergency_vehicle/Pages/view_nearest_ambulances.dart';
+import 'package:emergency_vehicle/widgets/map_widgets.dart';
 import 'package:flutter/material.dart';
 
 import 'Viewtrafficnoti.dart';
@@ -36,8 +37,8 @@ class Drawerclass extends StatelessWidget {
                     "Emergency Alerts", SendAlert()),
                 _buildDrawerItem(context, Icons.traffic,
                     "Traffic Notifications", ViewNearestNotification()),
-                _buildDrawerItem(
-                    context, Icons.feedback, "Send Feedback", SendFeedback()),
+                _buildDrawerItem(context, Icons.feedback, "Send Feedback",
+                    ShowMapInsideApp()),
                 Divider(),
                 _buildDrawerItem(context, Icons.logout, "Logout", const login(),
                     isLogout: true),

@@ -115,19 +115,17 @@ class _loginState extends State<login> {
                         if (type == 'user') {
                           String lid = jasondata['lid'].toString();
                           sh.setString("lid", lid);
-                          Navigator.push(context,
-                              MaterialPageRoute(
-                                  builder: (context) => sapp()));
+                          // Navigator.push(context,
+                          //     MaterialPageRoute(
+                          //         builder: (context) => sapp()));
 
                           Navigator.push(context,
                               MaterialPageRoute(builder: (context) => Home()));
-                        }
-                        else if (type == 'ambulance') {
+                        } else if (type == 'ambulance') {
                           String lid = jasondata['lid'].toString();
                           sh.setString("lid", lid);
                           Navigator.push(context,
-                              MaterialPageRoute(
-                                  builder: (context) => AmbPP()));
+                              MaterialPageRoute(builder: (context) => AmbPP()));
 
                           Navigator.push(
                               context,
@@ -154,8 +152,6 @@ class _loginState extends State<login> {
                           color: Colors.white),
                     ),
                   ),
-
-
                 ),
                 const SizedBox(height: 12),
 
