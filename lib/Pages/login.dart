@@ -7,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+import 'amb location_service.dart';
 import 'home.dart';
+import 'location_service.dart';
 
 class login extends StatefulWidget {
   const login({super.key});
@@ -114,10 +116,19 @@ class _loginState extends State<login> {
                           String lid = jasondata['lid'].toString();
                           sh.setString("lid", lid);
                           Navigator.push(context,
+                              MaterialPageRoute(
+                                  builder: (context) => sapp()));
+
+                          Navigator.push(context,
                               MaterialPageRoute(builder: (context) => Home()));
-                        } else if (type == 'ambulance') {
+                        }
+                        else if (type == 'ambulance') {
                           String lid = jasondata['lid'].toString();
                           sh.setString("lid", lid);
+                          Navigator.push(context,
+                              MaterialPageRoute(
+                                  builder: (context) => AmbPP()));
+
                           Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -143,6 +154,8 @@ class _loginState extends State<login> {
                           color: Colors.white),
                     ),
                   ),
+
+
                 ),
                 const SizedBox(height: 12),
 

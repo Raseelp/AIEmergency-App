@@ -63,6 +63,7 @@ class _HomeState extends State<Home> {
   // }
 
   Future<void> sendSOSRequest() async {
+
     SharedPreferences sh = await SharedPreferences.getInstance();
     String? url = sh.getString('url'); // Keep null safety handling
     String? lid = sh.getString('lid');
@@ -80,7 +81,12 @@ class _HomeState extends State<Home> {
     final requestUrl = Uri.parse(url + 'user_send_ambulance_request');
 
     try {
-      final response = await http.post(requestUrl, body: {'lid': lid});
+      final response = await http.post(requestUrl, body: {
+
+        'lid': lid,
+        'latitude': _latitude.toString(),
+        'longitude': _longitude.toString(),
+      });
       if (response.statusCode == 200) {
         String status = jsonDecode(response.body)['status'];
         Fluttertoast.showToast(
@@ -158,6 +164,16 @@ class _HomeState extends State<Home> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 20),
+              const SizedBox(height: 20),
+              Text(
+                _currentLocation,
+                style: const TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: _getCurrentLocation,
+                child: const Text("Get Current Location"),
+              ),
 
               // User Greeting
               Row(
@@ -203,7 +219,10 @@ class _HomeState extends State<Home> {
 
               // SOS Button with Shadow
               GestureDetector(
-                onTap: sendSOSRequest,
+                onTap: () {
+                  _getCurrentLocation();
+                  sendSOSRequest();
+                },
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
