@@ -25,6 +25,7 @@ class _HomeState extends State<Home> {
   String _currentLocationStatus = "Press the button to get the location";
   double? _latitude;
   double? _longitude;
+  String username = 'User';
   final MapController _mapController = MapController();
   LatLng? currentLocation = LatLng(11.2588, 75.7804);
   List<Ambulance> fetchedAmbulances = [];
@@ -33,6 +34,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     _fetchambulancesOnInit();
+    showUsername();
     Future.delayed(const Duration(milliseconds: 300), () {
       setState(() {
         _isMapReady = true;
@@ -61,9 +63,42 @@ class _HomeState extends State<Home> {
     });
   }
 
+  Future<String?> getUsername() async {
+    SharedPreferences sh = await SharedPreferences.getInstance();
+    String? lid = sh.getString('lid');
+    String? url = sh.getString('url');
+    print(url);
+
+    try {
+      final response = await http.get(Uri.parse(url! + 'get-username/$lid/'));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data['username'];
+      } else {
+        print('Error: ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Exception: $e');
+      return null;
+    }
+  }
+
+  Future<void> showUsername() async {
+    String? fetchedUsername = await getUsername();
+    if (fetchedUsername != null) {
+      setState(() {
+        username = fetchedUsername;
+      });
+    } else {
+      print('User not found or error occurred');
+    }
+  }
+
   Future<void> sendSOSRequest() async {
     SharedPreferences sh = await SharedPreferences.getInstance();
-    String? url = sh.getString('url'); // Keep null safety handling
+    String? url = sh.getString('url');
     String? lid = sh.getString('lid');
 
     if (url == null || lid == null || url.isEmpty || lid.isEmpty) {
@@ -163,42 +198,6 @@ class _HomeState extends State<Home> {
     }
   }
 
-  // Future<void> _getCurrentLocation() async {
-  //   try {
-  //     LocationPermission permission = await Geolocator.checkPermission();
-
-  //     if (permission == LocationPermission.denied) {
-  //       permission = await Geolocator.requestPermission();
-  //       if (permission == LocationPermission.denied) {
-  //         setState(() {
-  //           _currentLocation = 'Location permissions are denied';
-  //         });
-  //         return;
-  //       }
-  //     }
-
-  //     if (permission == LocationPermission.deniedForever) {
-  //       setState(() {
-  //         _currentLocation = 'Location permissions are permanently denied';
-  //       });
-  //       return;
-  //     }
-
-  //     Position position = await Geolocator.getCurrentPosition(
-  //         desiredAccuracy: LocationAccuracy.high);
-  //     _latitude = position.latitude;
-  //     _longitude = position.longitude;
-
-  //     setState(() {
-  //       _currentLocation = 'Latitude: $_latitude, Longitude: $_longitude';
-  //     });
-  //   } catch (e) {
-  //     setState(() {
-  //       _currentLocation = 'Unable to fetch location: $e';
-  //     });
-  //   }
-
-  // }
   @override
   Widget build(BuildContext context) {
     final screenheight = MediaQuery.of(context).size.height;
@@ -247,33 +246,20 @@ class _HomeState extends State<Home> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // const SizedBox(height: 20),
-                    // const SizedBox(height: 20),
-                    // Text(
-                    //   _currentLocation,
-                    //   style: const TextStyle(fontSize: 16, color: Colors.grey),
-                    // ),
-                    // const SizedBox(height: 10),
-                    // ElevatedButton(
-                    //   onPressed: _getCurrentLocation,
-                    //   child: const Text("Get Current Location"),
-                    // ),
-
-                    // User Greeting
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Column(
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            const Text(
                               "Welcome back,",
                               style:
                                   TextStyle(fontSize: 16, color: Colors.grey),
                             ),
                             Text(
-                              "Jenifer Pilman",
-                              style: TextStyle(
+                              username,
+                              style: const TextStyle(
                                   fontSize: 22, fontWeight: FontWeight.bold),
                             ),
                           ],
