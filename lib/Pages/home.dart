@@ -107,7 +107,7 @@ class _HomeState extends State<Home> {
 
       setState(() {
         currentLocation = LatLng(position.latitude, position.longitude);
-        _mapController.move(currentLocation!, 14.0);
+        // _mapController.move(currentLocation!, 14.0);
       });
 
       // _latitude = position.latitude;
@@ -315,7 +315,7 @@ class _HomeState extends State<Home> {
                       getcurrentLocation: _getCurrentLocation(),
                       height: screenheight * 0.3,
                       width: screenwidth * 0.8,
-                      mapController: MapController(),
+                      mapController: _mapController,
                       currentLocation: currentLocation)
                   : Center(child: CircularProgressIndicator()),
               ElevatedButton(

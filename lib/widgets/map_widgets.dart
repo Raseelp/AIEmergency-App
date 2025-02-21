@@ -129,7 +129,13 @@ Widget UserMap(List<Ambulance> ambulances,
             child: FlutterMap(
               mapController: mapController,
               options: MapOptions(
-                initialCenter: currentLocation ?? LatLng(11.2588, 75.7804),
+                initialCenter:
+                    currentLocation ?? const LatLng(11.2588, 75.7804),
+                maxZoom: 19,
+                minZoom: 3,
+                interactionOptions: const InteractionOptions(
+                  flags: InteractiveFlag.all,
+                ),
               ),
               children: [
                 TileLayer(
@@ -150,11 +156,17 @@ Widget UserMap(List<Ambulance> ambulances,
                             onTap: () {
                               _showAmbulanceDetails(context, ambulance);
                             },
-                            child: const Icon(
-                              Icons.location_on,
-                              color: Colors.red,
-                              size: 40,
-                            ),
+                            child: ambulance.status == 'Available'
+                                ? const Icon(
+                                    Icons.location_on,
+                                    color: Colors.green,
+                                    size: 40,
+                                  )
+                                : const Icon(
+                                    Icons.location_on,
+                                    color: Colors.red,
+                                    size: 40,
+                                  ),
                           ),
                         ),
                       )
