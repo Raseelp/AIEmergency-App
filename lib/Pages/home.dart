@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:emergency_vehicle/Pages/models/ambulance_mode.dart';
 import 'package:emergency_vehicle/widgets/map_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -20,13 +21,29 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   String userAddress = "151-171 Montclair Ave, Newark, NJ 07104, USA";
-  // String userProfileImage = "assets/profile.jpg"; // Replace with actual image
   String? selectedAlert;
   String _currentLocationStatus = "Press the button to get the location";
   double? _latitude;
   double? _longitude;
   final MapController _mapController = MapController();
   LatLng? currentLocation = LatLng(11.2588, 75.7804);
+  List<Ambulance> fetchedAmbulances = [];
+  bool _isMapReady = false;
+
+  @override
+  void initState() {
+    _fetchambulancesOnInit();
+    Future.delayed(const Duration(milliseconds: 300), () {
+      setState(() {
+        _isMapReady = true;
+      });
+    });
+    super.initState();
+  }
+
+  Future<void> _fetchambulancesOnInit() async {
+    await fetchAmbulances();
+  }
 
   Future<void> sendSOSRequest() async {
     SharedPreferences sh = await SharedPreferences.getInstance();
@@ -91,7 +108,6 @@ class _HomeState extends State<Home> {
       setState(() {
         currentLocation = LatLng(position.latitude, position.longitude);
         _mapController.move(currentLocation!, 14.0);
-        print(currentLocation ?? '1' + 'issomethinff njfnj');
       });
 
       // _latitude = position.latitude;
@@ -103,8 +119,31 @@ class _HomeState extends State<Home> {
     } catch (e) {
       setState(() {
         _currentLocationStatus = 'Unable to fetch location: $e';
-        print(_currentLocationStatus);
       });
+    }
+  }
+
+  Future<void> fetchAmbulances() async {
+    SharedPreferences sh = await SharedPreferences.getInstance();
+    String? url = sh.getString('url');
+
+    final response =
+        await http.get(Uri.parse(url! + 'view_nearest_ambulances'));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      if (data['status'] == 'ok') {
+        List<Ambulance> ambulances = (data['data'] as List)
+            .map((jsonItem) => Ambulance.fromJson(jsonItem))
+            .toList();
+        setState(() {
+          fetchedAmbulances = ambulances;
+        });
+      } else {
+        throw Exception('Failed to load ambulances: ${data['status']}');
+      }
+    } else {
+      throw Exception('Failed to load ambulances');
     }
   }
 
@@ -270,12 +309,21 @@ class _HomeState extends State<Home> {
                   ],
                 ),
               ),
-              UserMap(
-                  getcurrentLocation: _getCurrentLocation(),
-                  height: screenheight * 0.3,
-                  width: screenwidth * 0.8,
-                  mapController: MapController(),
-                  currentLocation: currentLocation),
+              _isMapReady
+                  ? UserMap(fetchedAmbulances,
+                      context: context,
+                      getcurrentLocation: _getCurrentLocation(),
+                      height: screenheight * 0.3,
+                      width: screenwidth * 0.8,
+                      mapController: MapController(),
+                      currentLocation: currentLocation)
+                  : Center(child: CircularProgressIndicator()),
+              ElevatedButton(
+                  onPressed: () async {
+                    await fetchAmbulances();
+                    print(fetchedAmbulances);
+                  },
+                  child: Text('ReFetch Ambulances')),
 
               // // Current Location Section
               // Container(

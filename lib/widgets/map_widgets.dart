@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:emergency_vehicle/Pages/models/ambulance_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
@@ -13,9 +14,9 @@ import 'package:latlong2/latlong.dart';
 // }
 
 // class _ShowMapInsideAppState extends State<ShowMapInsideApp> {
-LatLng? currentLocation = LatLng(11.2588, 75.7804);
-String _currentLocationStatus = '';
-final MapController _mapController = MapController();
+// LatLng? currentLocation = LatLng(11.2588, 75.7804);
+// String _currentLocationStatus = '';
+// final MapController _mapController = MapController();
 //   @override
 //   Widget build(BuildContext context) {
 //     final screenheight = MediaQuery.of(context).size.height;
@@ -110,11 +111,12 @@ final MapController _mapController = MapController();
 //   }
 // }
 
-Widget UserMap(
+Widget UserMap(List<Ambulance> ambulances,
     {required Future<void> getcurrentLocation,
     required double height,
     required double width,
     required MapController mapController,
+    required BuildContext context,
     LatLng? currentLocation}) {
   return Column(
     mainAxisAlignment: MainAxisAlignment.center,
@@ -131,9 +133,32 @@ Widget UserMap(
               ),
               children: [
                 TileLayer(
-                  urlTemplate:
-                      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  subdomains: ['a', 'b', 'c'],
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                ),
+                MarkerLayer(
+                  markers: ambulances
+                      .where((ambulance) =>
+                          ambulance.latitude != null &&
+                          ambulance.longitude != null)
+                      .map(
+                        (ambulance) => Marker(
+                          point:
+                              LatLng(ambulance.latitude!, ambulance.longitude!),
+                          width: 40,
+                          height: 40,
+                          child: GestureDetector(
+                            onTap: () {
+                              _showAmbulanceDetails(context, ambulance);
+                            },
+                            child: const Icon(
+                              Icons.location_on,
+                              color: Colors.red,
+                              size: 40,
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
                 ),
                 MarkerLayer(markers: [
                   Marker(
@@ -154,7 +179,31 @@ Widget UserMap(
           onPressed: () {
             getcurrentLocation;
           },
-          child: Text('ReFetch User Location')),
+          child: const Text('ReFetch User Location')),
     ],
+  );
+}
+
+void _showAmbulanceDetails(BuildContext context, Ambulance ambulance) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text("Ambulance Details"),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text("Vehicle Number: ${ambulance.vehicleNumber}"),
+          Text("Hospital: ${ambulance.hospital}"),
+          Text("Type: ${ambulance.type}"),
+          Text("Status: ${ambulance.status}"),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Close"),
+        ),
+      ],
+    ),
   );
 }

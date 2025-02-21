@@ -124,8 +124,8 @@ class _loginState extends State<login> {
                         } else if (type == 'ambulance') {
                           String lid = jasondata['lid'].toString();
                           sh.setString("lid", lid);
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => AmbPP()));
+                          // Navigator.push(context,
+                          //     MaterialPageRoute(builder: (context) => AmbPP()));
 
                           Navigator.push(
                               context,
