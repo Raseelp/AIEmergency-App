@@ -110,8 +110,8 @@ class _HomeState extends State<Home> {
         // _mapController.move(currentLocation!, 14.0);
       });
 
-      // _latitude = position.latitude;
-      // _longitude = position.longitude;
+      _latitude = position.latitude;
+      _longitude = position.longitude;
 
       setState(() {
         _currentLocationStatus = currentLocation.toString();

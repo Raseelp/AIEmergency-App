@@ -139,6 +139,9 @@ Widget UserMap(List<Ambulance> ambulances,
               ),
               children: [
                 TileLayer(
+                  // urlTemplate:
+                  //     'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=010b64df977f45d5a757a2463c91ad9b',
+                  //This is the original url for the map,but commenting it out becouse dont want to run out limit while testing
                   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 ),
                 MarkerLayer(
@@ -150,23 +153,30 @@ Widget UserMap(List<Ambulance> ambulances,
                         (ambulance) => Marker(
                           point:
                               LatLng(ambulance.latitude!, ambulance.longitude!),
-                          width: 40,
-                          height: 40,
+                          width: 60,
+                          height: 60,
                           child: GestureDetector(
                             onTap: () {
                               _showAmbulanceDetails(context, ambulance);
                             },
-                            child: ambulance.status == 'Available'
-                                ? const Icon(
-                                    Icons.location_on,
-                                    color: Colors.green,
-                                    size: 40,
-                                  )
-                                : const Icon(
-                                    Icons.location_on,
-                                    color: Colors.red,
-                                    size: 40,
-                                  ),
+                            child: Transform(
+                              transform: Matrix4.rotationZ(45 *
+                                  (3.141592653589793 /
+                                      180)), // Rotate by 45 degrees
+                              alignment: Alignment.center,
+                              child: Image.asset('asset/amb_icon.png'),
+                            ),
+                            // child: ambulance.status == 'Available'
+                            //     ? const Icon(
+                            //         Icons.location_on,
+                            //         color: Colors.green,
+                            //         size: 40,
+                            //       )
+                            //     : const Icon(
+                            //         Icons.location_on,
+                            //         color: Colors.red,
+                            //         size: 40,
+                            //       ),
                           ),
                         ),
                       )
