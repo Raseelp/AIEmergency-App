@@ -45,6 +45,22 @@ class _HomeState extends State<Home> {
     await fetchAmbulances();
   }
 
+  bool _isFullScreen = false;
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullScreen = !_isFullScreen;
+    });
+  }
+
+  bool _isHelp = false;
+
+  void _toggleHelp() {
+    setState(() {
+      _isHelp = !_isHelp;
+    });
+  }
+
   Future<void> sendSOSRequest() async {
     SharedPreferences sh = await SharedPreferences.getInstance();
     String? url = sh.getString('url'); // Keep null safety handling
@@ -187,192 +203,170 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     final screenheight = MediaQuery.of(context).size.height;
     final screenwidth = MediaQuery.of(context).size.width;
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          "Emergency SOS",
-          style: TextStyle(
-              color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.redAccent),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      drawer: const Drawerclass(),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // const SizedBox(height: 20),
-              // const SizedBox(height: 20),
-              // Text(
-              //   _currentLocation,
-              //   style: const TextStyle(fontSize: 16, color: Colors.grey),
-              // ),
-              // const SizedBox(height: 10),
-              // ElevatedButton(
-              //   onPressed: _getCurrentLocation,
-              //   child: const Text("Get Current Location"),
-              // ),
-
-              // User Greeting
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Welcome back,",
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
-                      ),
-                      Text(
-                        "Jenifer Pilman",
-                        style: TextStyle(
-                            fontSize: 22, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  CircleAvatar(
-                    radius: 25,
-                    backgroundColor: Colors.grey[300],
-                    child: Icon(Icons.person, size: 30, color: Colors.white),
-                  ),
-                ],
+    return _isFullScreen
+        ? Scaffold(
+            body: _isMapReady
+                ? UserMap(fetchedAmbulances, fetchAmbulances(),
+                    context: context,
+                    getcurrentLocation: _getCurrentLocation(),
+                    height: screenheight * 0.3,
+                    width: screenwidth * 0.8,
+                    mapController: _mapController,
+                    currentLocation: currentLocation,
+                    isFullScreen: _isFullScreen,
+                    toggleFullScreen: _toggleFullScreen,
+                    ishelp: _isHelp,
+                    toggleHelp: _toggleHelp)
+                : const Center(child: CircularProgressIndicator()),
+          )
+        : Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              title: const Text(
+                "Emergency SOS",
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
               ),
-
-              const SizedBox(height: 30),
-
-              // Emergency Message
-              const Text(
-                "Are you in emergency?",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                "Press the button below, help will reach you soon.",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 40),
-
-              // SOS Button with Shadow
-              GestureDetector(
-                onTap: () {
-                  _getCurrentLocation();
-                  sendSOSRequest();
-                },
-                child: Stack(
-                  alignment: Alignment.center,
+              centerTitle: true,
+              actions: [
+                IconButton(
+                  icon:
+                      const Icon(Icons.notifications, color: Colors.redAccent),
+                  onPressed: () {},
+                ),
+              ],
+            ),
+            drawer: const Drawerclass(),
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Container(
-                      width: 160,
-                      height: 160,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: const LinearGradient(
-                          colors: [Colors.redAccent, Colors.deepOrange],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
+                    // const SizedBox(height: 20),
+                    // const SizedBox(height: 20),
+                    // Text(
+                    //   _currentLocation,
+                    //   style: const TextStyle(fontSize: 16, color: Colors.grey),
+                    // ),
+                    // const SizedBox(height: 10),
+                    // ElevatedButton(
+                    //   onPressed: _getCurrentLocation,
+                    //   child: const Text("Get Current Location"),
+                    // ),
+
+                    // User Greeting
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Welcome back,",
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.grey),
+                            ),
+                            Text(
+                              "Jenifer Pilman",
+                              style: TextStyle(
+                                  fontSize: 22, fontWeight: FontWeight.bold),
+                            ),
+                          ],
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.redAccent.withOpacity(0.5),
-                            blurRadius: 40,
-                            spreadRadius: 10,
-                          ),
-                        ],
+                        CircleAvatar(
+                          radius: 25,
+                          backgroundColor: Colors.grey[300],
+                          child:
+                              Icon(Icons.person, size: 30, color: Colors.white),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 30),
+
+                    // Emergency Message
+                    const Text(
+                      "Are you in emergency?",
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      "Press the button below, help will reach you soon.",
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 40),
+
+                    // SOS Button with Shadow
+                    GestureDetector(
+                      onTap: () {
+                        _getCurrentLocation();
+                        sendSOSRequest();
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: screenheight * 0.05),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              width: 160,
+                              height: 160,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: const LinearGradient(
+                                  colors: [Colors.redAccent, Colors.deepOrange],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.redAccent.withOpacity(0.5),
+                                    blurRadius: 40,
+                                    spreadRadius: 10,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              width: 120,
+                              height: 120,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.redAccent,
+                              ),
+                              child: const Center(
+                                child: FaIcon(FontAwesomeIcons.ambulance,
+                                    color: Colors.white, size: 50),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.redAccent,
-                      ),
-                      child: const Center(
-                        child: FaIcon(FontAwesomeIcons.ambulance,
-                            color: Colors.white, size: 50),
-                      ),
-                    ),
+                    _isMapReady
+                        ? UserMap(fetchedAmbulances, fetchAmbulances(),
+                            context: context,
+                            getcurrentLocation: _getCurrentLocation(),
+                            height: screenheight * 0.3,
+                            width: screenwidth * 0.8,
+                            mapController: _mapController,
+                            currentLocation: currentLocation,
+                            isFullScreen: _isFullScreen,
+                            toggleFullScreen: _toggleFullScreen,
+                            ishelp: _isHelp,
+                            toggleHelp: _toggleHelp)
+                        : const Center(child: CircularProgressIndicator()),
                   ],
                 ),
               ),
-              _isMapReady
-                  ? UserMap(fetchedAmbulances,
-                      context: context,
-                      getcurrentLocation: _getCurrentLocation(),
-                      height: screenheight * 0.3,
-                      width: screenwidth * 0.8,
-                      mapController: _mapController,
-                      currentLocation: currentLocation)
-                  : Center(child: CircularProgressIndicator()),
-              ElevatedButton(
-                  onPressed: () async {
-                    await fetchAmbulances();
-                    print(fetchedAmbulances);
-                  },
-                  child: Text('ReFetch Ambulances')),
-
-              // // Current Location Section
-              // Container(
-              //   padding: const EdgeInsets.all(15),
-              //   decoration: BoxDecoration(
-              //     color: Colors.white,
-              //     borderRadius: BorderRadius.circular(12),
-              //     boxShadow: [
-              //       BoxShadow(
-              //         color: Colors.grey.withOpacity(0.2),
-              //         blurRadius: 5,
-              //         spreadRadius: 1,
-              //       ),
-              //     ],
-              //   ),
-              //   child: Row(
-              //     children: [
-              //       const CircleAvatar(
-              //         radius: 25,
-              //         backgroundColor: Colors.redAccent,
-              //         child: Icon(Icons.location_on, color: Colors.white),
-              //       ),
-              //       const SizedBox(width: 12),
-              //       Expanded(
-              //         child: Column(
-              //           crossAxisAlignment: CrossAxisAlignment.start,
-              //           children: [
-              //             const Text(
-              //               "Your Current Address",
-              //               style: TextStyle(
-              //                   fontSize: 14, fontWeight: FontWeight.bold),
-              //             ),
-              //             Text(
-              //               userAddress,
-              //               style: const TextStyle(
-              //                   fontSize: 14, color: Colors.grey),
-              //             ),
-              //           ],
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
-
-              // const Spacer(),
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+          );
   }
 }

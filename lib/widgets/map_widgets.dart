@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:emergency_vehicle/Pages/models/ambulance_mode.dart';
+import 'package:emergency_vehicle/widgets/top_model_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
@@ -111,97 +112,437 @@ import 'package:latlong2/latlong.dart';
 //   }
 // }
 
-Widget UserMap(List<Ambulance> ambulances,
-    {required Future<void> getcurrentLocation,
-    required double height,
-    required double width,
-    required MapController mapController,
-    required BuildContext context,
-    LatLng? currentLocation}) {
+Widget UserMap(
+  List<Ambulance> ambulances,
+  Future<void> refetchAmbulance, {
+  required Future<void> getcurrentLocation,
+  required double height,
+  required double width,
+  required MapController mapController,
+  required BuildContext context,
+  LatLng? currentLocation,
+  required bool isFullScreen,
+  required VoidCallback toggleFullScreen,
+  required bool ishelp,
+  required VoidCallback toggleHelp,
+}) {
   return Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
       Center(
-        child: Padding(
-          padding: const EdgeInsets.all(15),
-          child: SizedBox(
-            height: height,
-            child: FlutterMap(
-              mapController: mapController,
-              options: MapOptions(
-                initialCenter:
-                    currentLocation ?? const LatLng(11.2588, 75.7804),
-                maxZoom: 19,
-                minZoom: 3,
-                interactionOptions: const InteractionOptions(
-                  flags: InteractiveFlag.all,
-                ),
-              ),
-              children: [
-                TileLayer(
-                  // urlTemplate:
-                  //     'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=010b64df977f45d5a757a2463c91ad9b',
-                  //This is the original url for the map,but commenting it out becouse dont want to run out limit while testing
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                ),
-                MarkerLayer(
-                  markers: ambulances
-                      .where((ambulance) =>
-                          ambulance.latitude != null &&
-                          ambulance.longitude != null)
-                      .map(
-                        (ambulance) => Marker(
-                          point:
-                              LatLng(ambulance.latitude!, ambulance.longitude!),
-                          width: 60,
-                          height: 60,
-                          child: GestureDetector(
-                            onTap: () {
-                              _showAmbulanceDetails(context, ambulance);
-                            },
-                            child: Transform(
-                              transform: Matrix4.rotationZ(45 *
-                                  (3.141592653589793 /
-                                      180)), // Rotate by 45 degrees
-                              alignment: Alignment.center,
-                              child: Image.asset('asset/amb_icon.png'),
-                            ),
-                            // child: ambulance.status == 'Available'
-                            //     ? const Icon(
-                            //         Icons.location_on,
-                            //         color: Colors.green,
-                            //         size: 40,
-                            //       )
-                            //     : const Icon(
-                            //         Icons.location_on,
-                            //         color: Colors.red,
-                            //         size: 40,
-                            //       ),
-                          ),
+        child: SizedBox(
+          height: isFullScreen ? MediaQuery.of(context).size.height : height,
+          child: isFullScreen
+              ? Stack(children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: FlutterMap(
+                      mapController: mapController,
+                      options: MapOptions(
+                        initialCenter:
+                            currentLocation ?? const LatLng(11.2588, 75.7804),
+                        maxZoom: 19,
+                        minZoom: 3,
+                        interactionOptions: const InteractionOptions(
+                          flags: InteractiveFlag.all,
                         ),
-                      )
-                      .toList(),
-                ),
-                MarkerLayer(markers: [
-                  Marker(
-                    point: currentLocation ?? LatLng(11.2588, 75.7804),
-                    child: const Icon(
-                      Icons.person_pin_circle,
-                      color: Colors.blue,
-                      size: 40,
+                      ),
+                      children: [
+                        TileLayer(
+                          // urlTemplate:
+                          //     'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=010b64df977f45d5a757a2463c91ad9b',
+                          //This is the original url for the map,but commenting it out becouse dont want to run out limit while testing
+                          urlTemplate:
+                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        ),
+                        MarkerLayer(
+                          markers: ambulances
+                              .where((ambulance) =>
+                                  ambulance.latitude != null &&
+                                  ambulance.longitude != null)
+                              .map(
+                                (ambulance) => Marker(
+                                  point: LatLng(ambulance.latitude!,
+                                      ambulance.longitude!),
+                                  width: 60,
+                                  height: 60,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      // _showAmbulanceDetails(context, ambulance);
+                                      _showAmbulanceDetailsTopModelSheet(
+                                          context, ambulance);
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: ambulance.status ==
+                                                    'Available'
+                                                ? Colors.green.withOpacity(0.6)
+                                                : Colors.red.withOpacity(0.6),
+                                            blurRadius: 20,
+                                            spreadRadius: 5,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Transform(
+                                        transform: Matrix4.rotationZ(
+                                            45 * (3.141592653589793 / 180)),
+                                        alignment: Alignment.center,
+                                        child:
+                                            Image.asset('asset/amb_icon.png'),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                        ),
+                        MarkerLayer(markers: [
+                          Marker(
+                            point: currentLocation ??
+                                const LatLng(11.2588, 75.7804),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.blue.withOpacity(0.6),
+                                    blurRadius: 20,
+                                    spreadRadius: 5,
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.person_pin_circle,
+                                color: Colors.blue,
+                                size: 40,
+                              ),
+                            ),
+                          )
+                        ])
+                      ],
                     ),
-                  )
+                  ),
+                  Positioned(
+                    bottom: 40,
+                    left: 40,
+                    child: SizedBox(
+                      height: 60,
+                      width: 60,
+                      child: IconButton(
+                        onPressed: () {
+                          getcurrentLocation;
+                          refetchAmbulance;
+                          mapController.move(currentLocation!, 14);
+                        },
+                        icon: const Icon(
+                          Icons.refresh,
+                          color: Colors.white,
+                          size: 25,
+                        ),
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          shape: const CircleBorder(),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 40,
+                    right: 40,
+                    child: SizedBox(
+                      height: 60,
+                      width: 60,
+                      child: IconButton(
+                        onPressed: () {
+                          toggleFullScreen();
+                        },
+                        icon: Icon(
+                          isFullScreen
+                              ? Icons.fullscreen_exit
+                              : Icons.fullscreen,
+                          color: Colors.white,
+                          size: 25,
+                        ),
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          shape: const CircleBorder(),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                      top: 40,
+                      right: 40,
+                      child: ishelp
+                          ? Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.8),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.6),
+                                      blurRadius: 40,
+                                      spreadRadius: 5,
+                                    ),
+                                  ],
+                                  borderRadius: BorderRadius.circular(12)),
+                              height: height,
+                              width: width,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                    'Hints',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.blue.withOpacity(0.6),
+                                              blurRadius: 20,
+                                              spreadRadius: 5,
+                                            ),
+                                          ],
+                                        ),
+                                        child: const Icon(
+                                          Icons.person_pin_circle,
+                                          color: Colors.blue,
+                                          size: 40,
+                                        ),
+                                      ),
+                                      const Text(
+                                        'User Location',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Container(
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.green.withOpacity(0.6),
+                                              blurRadius: 10,
+                                              spreadRadius: 5,
+                                            ),
+                                          ],
+                                        ),
+                                        child: Transform(
+                                          transform: Matrix4.rotationZ(
+                                              45 * (3.141592653589793 / 180)),
+                                          alignment: Alignment.center,
+                                          child:
+                                              Image.asset('asset/amb_icon.png'),
+                                        ),
+                                      ),
+                                      const Text(
+                                        'Available Ambulance',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Container(
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.red.withOpacity(0.6),
+                                              blurRadius: 10,
+                                              spreadRadius: 5,
+                                            ),
+                                          ],
+                                        ),
+                                        child: Transform(
+                                          transform: Matrix4.rotationZ(
+                                              45 * (3.141592653589793 / 180)),
+                                          alignment: Alignment.center,
+                                          child:
+                                              Image.asset('asset/amb_icon.png'),
+                                        ),
+                                      ),
+                                      const Text(
+                                        'Unavailable Ambulance',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        elevation: 0,
+                                        backgroundColor: Colors.green),
+                                    onPressed: () {
+                                      toggleHelp();
+                                    },
+                                    child: const Text(
+                                      'Close',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            )
+                          : SizedBox(
+                              height: 60,
+                              width: 60,
+                              child: IconButton(
+                                onPressed: () {
+                                  toggleHelp();
+                                },
+                                icon: const Icon(
+                                  Icons.question_mark_outlined,
+                                  color: Colors.white,
+                                  size: 25,
+                                ),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  shape: const CircleBorder(),
+                                ),
+                              ),
+                            )),
                 ])
-              ],
-            ),
-          ),
+              : Stack(children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: FlutterMap(
+                      mapController: mapController,
+                      options: MapOptions(
+                        initialCenter:
+                            currentLocation ?? const LatLng(11.2588, 75.7804),
+                        maxZoom: 19,
+                        minZoom: 3,
+                        interactionOptions: const InteractionOptions(
+                          flags: InteractiveFlag.all,
+                        ),
+                      ),
+                      children: [
+                        TileLayer(
+                          // urlTemplate:
+                          //     'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=010b64df977f45d5a757a2463c91ad9b',
+                          //This is the original url for the map,but commenting it out becouse dont want to run out limit while testing
+                          urlTemplate:
+                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        ),
+                        MarkerLayer(
+                          markers: ambulances
+                              .where((ambulance) =>
+                                  ambulance.latitude != null &&
+                                  ambulance.longitude != null)
+                              .map(
+                                (ambulance) => Marker(
+                                  point: LatLng(ambulance.latitude!,
+                                      ambulance.longitude!),
+                                  width: 60,
+                                  height: 60,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      // _showAmbulanceDetails(context, ambulance);
+                                      toggleFullScreen();
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: ambulance.status ==
+                                                    'Available'
+                                                ? Colors.green.withOpacity(0.6)
+                                                : Colors.red.withOpacity(0.6),
+                                            blurRadius: 20,
+                                            spreadRadius: 5,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Transform(
+                                        transform: Matrix4.rotationZ(
+                                            45 * (3.141592653589793 / 180)),
+                                        alignment: Alignment.center,
+                                        child:
+                                            Image.asset('asset/amb_icon.png'),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                        ),
+                        MarkerLayer(markers: [
+                          Marker(
+                            point: currentLocation ??
+                                const LatLng(11.2588, 75.7804),
+                            child: const Icon(
+                              Icons.person_pin_circle,
+                              color: Colors.blue,
+                              size: 40,
+                            ),
+                          )
+                        ])
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 10,
+                    left: 10,
+                    child: IconButton(
+                      onPressed: () {
+                        getcurrentLocation;
+                        refetchAmbulance;
+                        mapController.move(currentLocation!, 14);
+                      },
+                      icon: const Icon(Icons.refresh, color: Colors.white),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        shape: const CircleBorder(),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 10,
+                    right: 10,
+                    child: IconButton(
+                      onPressed: () {
+                        toggleFullScreen();
+                        print(isFullScreen);
+                      },
+                      icon: Icon(
+                          isFullScreen
+                              ? Icons.fullscreen_exit
+                              : Icons.fullscreen,
+                          color: Colors.white),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        shape: const CircleBorder(),
+                      ),
+                    ),
+                  ),
+                ]),
         ),
       ),
-      ElevatedButton(
-          onPressed: () {
-            getcurrentLocation;
-          },
-          child: const Text('ReFetch User Location')),
     ],
   );
 }
@@ -228,4 +569,20 @@ void _showAmbulanceDetails(BuildContext context, Ambulance ambulance) {
       ],
     ),
   );
+}
+
+void _showAmbulanceDetailsTopModelSheet(
+    BuildContext context, Ambulance ambulance) {
+  OverlayEntry? overlayEntry;
+
+  overlayEntry = OverlayEntry(
+    builder: (context) => TopSheetWidget(
+      ambulance: ambulance,
+      onClose: () {
+        overlayEntry?.remove();
+      },
+    ),
+  );
+
+  Overlay.of(context).insert(overlayEntry);
 }
