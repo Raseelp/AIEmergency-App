@@ -65,6 +65,47 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
     }
   }
 
+  Future<void> acceptRequest(int requestId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? lid = prefs.getString('lid');
+    String? url = prefs.getString('url');
+    print(url);
+
+    if (lid != null && url != null && url.isNotEmpty) {
+      try {
+        final response = await http.post(
+          Uri.parse(url + 'accept_request/$requestId/'), // Updated URL
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({'lid': lid}), // Send ambulance's lid
+        );
+
+        if (response.statusCode == 200) {
+          final result = jsonDecode(response.body)['status'];
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text(result == 'Accepted'
+                    ? 'Request accepted successfully'
+                    : result)),
+          );
+          fetchAmbulanceRequests(); // Refresh requests after acceptance
+        } else {
+          final error = jsonDecode(response.body)['status'];
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: $error')),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('LID or URL not found')),
+      );
+    }
+  }
+
   Future<void> updateStatus(String status) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? lid = prefs.getString('lid'); // Get the saved lid
@@ -102,44 +143,6 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
       );
     }
   }
-  // Future<void> alert() async {
-  //     if (_latitude == null || _longitude == null) {
-  //       Fluttertoast.showToast(msg: "Please fetch your location first.");
-  //       return;
-  //     }
-  //
-  //     final sh = await SharedPreferences.getInstance();
-  //     String url = sh.getString("url").toString();
-  //     try {
-  //       var data = await http.post(
-  //         Uri.parse(url + "user_send_ambulance_request"),
-  //         body: {
-  //           'lid': sh.getString("lid").toString(),
-  //           // 'alert': selectedAlert,
-  //           'latitude': _latitude.toString(),
-  //           'longitude': _longitude.toString(),
-  //         },
-  //       );
-  //       var jsonData = json.decode(data.body);
-  //       String status = jsonData['status'].toString();
-  //
-  //       if (status == "ok") {
-  //         Fluttertoast.showToast(msg: "Alert Sent!");
-  //         // Navigator.push(
-  //         //   context,
-  //         //   MaterialPageRoute(
-  //         //     builder: (context) => AmbulanceHomepage(),
-  //         //   ),
-  //         // );
-  //       } else {
-  //         // _showAlertDialog("Sending alert failed.");
-  //       }
-  //     } catch (e) {
-  //       print(e);
-  //       // _showAlertDialog("An error occurred: $e");
-  //     }
-  //
-  // }
 
   Future<void> sendSOSRequest() async {
     SharedPreferences sh = await SharedPreferences.getInstance();
@@ -220,6 +223,10 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        title: const Text(
+          "Ambulance Home",
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
@@ -237,16 +244,6 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Text(
-                //   _currentLocation,
-                //   style: const TextStyle(fontSize: 16, color: Colors.grey),
-                // ),
-                //
-                // // Emergency Message
-                const Text(
-                  "Ambulance Home",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
                 Center(
                   child: DropdownButton<String>(
                     value: selectedItem,
@@ -295,116 +292,19 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                                             'Location: ${request['latitude']}, ${request['longitude']}'),
                                       ],
                                     ),
-                                    trailing:
-                                        const Icon(Icons.arrow_forward_ios),
+                                    trailing: request['Status'] == 'Requested'
+                                        ? ElevatedButton(
+                                            onPressed: () =>
+                                                acceptRequest(request['id']),
+                                            child: const Text('Accept'),
+                                          )
+                                        : const Icon(Icons.check_circle,
+                                            color: Colors.green),
                                   ),
                                 );
                               },
                             ),
                           ),
-                // const SizedBox(height: 10),
-                // const Text(
-                //   "Press the button below, help will reach you soon.",
-                //   style: TextStyle(fontSize: 16, color: Colors.grey),
-                //   textAlign: TextAlign.center,
-                // ),
-                // const SizedBox(height: 30),
-                //
-                // // SOS Button
-                // GestureDetector(
-                //   onTap: sendSOSRequest,
-                //   child: Container(
-                //     padding: const EdgeInsets.all(10),
-                //     decoration: BoxDecoration(
-                //       shape: BoxShape.circle,
-                //       boxShadow: [
-                //         BoxShadow(
-                //           color: Colors.redAccent.withOpacity(0.4),
-                //           blurRadius: 30,
-                //           spreadRadius: 10,
-                //         ),
-                //       ],
-                //     ),
-                //     child: Container(
-                //       width: 120,
-                //       height: 120,
-                //       decoration: const BoxDecoration(
-                //         color: Colors.redAccent,
-                //         shape: BoxShape.circle,
-                //       ),
-                //       child: const Center(
-                //         child: Text(
-                //           "SOS",
-                //           style: TextStyle(
-                //             color: Colors.white,
-                //             fontSize: 26,
-                //             fontWeight: FontWeight.bold,
-                //           ),
-                //         ),
-                //       ),
-                //     ),
-                //   ),
-                // ),
-                // const SizedBox(height: 40),
-                //
-                // // Current Location Section
-                // Container(
-                //   padding: const EdgeInsets.all(15),
-                //   decoration: BoxDecoration(
-                //     color: Colors.white,
-                //     borderRadius: BorderRadius.circular(10),
-                //     boxShadow: [
-                //       BoxShadow(
-                //         color: Colors.grey.withOpacity(0.2),
-                //         blurRadius: 5,
-                //         spreadRadius: 1,
-                //       ),
-                //     ],
-                //   ),
-                //   child: Row(
-                //     children: [
-                //       CircleAvatar(
-                //         radius: 22,
-                //         backgroundImage: AssetImage(userProfileImage),
-                //       ),
-                //       const SizedBox(width: 10),
-                //       Expanded(
-                //         child: Column(
-                //           crossAxisAlignment: CrossAxisAlignment.start,
-                //           children: [
-                //             const Text(
-                //               "Your current address",
-                //               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                //             ),
-                //             Text(
-                //               userAddress,
-                //               style: const TextStyle(fontSize: 14, color: Colors.grey),
-                //             ),
-                //           ],
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
-                //
-                // const Spacer(),
-
-                // Bottom Navigation
-                // Container(
-                //   padding: const EdgeInsets.symmetric(vertical: 10),
-                //   decoration: BoxDecoration(
-                //     color: Colors.redAccent,
-                //     borderRadius: BorderRadius.circular(15),
-                //   ),
-                //   child: const Row(
-                //     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                //     children: [
-                //       Icon(Icons.AmbulanceHome, color: Colors.white, size: 30),
-                //       Icon(Icons.location_on_outlined, color: Colors.white, size: 30),
-                //       Icon(Icons.settings, color: Colors.white, size: 30),
-                //     ],
-                //   ),
-                // ),
               ],
             ),
           ),
