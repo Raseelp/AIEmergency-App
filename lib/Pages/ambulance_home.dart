@@ -22,7 +22,86 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
   String _currentLocation = "Press the button to get the location";
   double? _latitude;
   double? _longitude;
+  String? selectedItem; // Store selected value
+  final List<String> items = ['Available', 'Unavailable']; // List of
+  List<Map<String, dynamic>> requests = [];
+  bool isLoading = false;
 
+  Future<void> fetchAmbulanceRequests() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? lid = prefs.getString('lid');
+    String? url = prefs.getString('url');
+
+    if (lid != null) {
+      try {
+        final response = await http.post(
+          Uri.parse(url! +
+              'get_ambulance_requests/'), // Replace with your backend URL
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({'lid': lid}),
+        );
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          setState(() {
+            requests = List<Map<String, dynamic>>.from(data['requests']);
+            isLoading = false;
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('Failed to fetch requests: ${response.body}')),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('LID not found')),
+      );
+    }
+  }
+
+  Future<void> updateStatus(String status) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? lid = prefs.getString('lid'); // Get the saved lid
+    String? url = prefs.getString('url');
+
+    if (lid != null) {
+      try {
+        final response = await http.post(
+          Uri.parse(url! + 'update_status/'), // Replace with your backend URL
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({
+            'lid': lid,
+            'status': status,
+          }),
+        );
+
+        if (response.statusCode == 200) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Status updated successfully')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('Failed to update status: ${response.body}')),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('LID not found')),
+      );
+    }
+  }
   // Future<void> alert() async {
   //     if (_latitude == null || _longitude == null) {
   //       Fluttertoast.showToast(msg: "Please fetch your location first.");
@@ -131,6 +210,12 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
   }
 
   @override
+  void initState() {
+    fetchAmbulanceRequests();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -162,6 +247,61 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                   "Ambulance Home",
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
+                Center(
+                  child: DropdownButton<String>(
+                    value: selectedItem,
+                    hint: const Text('Select Availability'),
+                    items: items.map((String item) {
+                      return DropdownMenuItem<String>(
+                        value: item,
+                        child: Text(item),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedItem = newValue;
+                        updateStatus(selectedItem.toString());
+                      });
+                    },
+                    icon: const Icon(Icons.arrow_drop_down_circle,
+                        color: Colors.blue),
+                    dropdownColor: Colors.white,
+                    style: const TextStyle(color: Colors.black, fontSize: 18),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : requests.isEmpty
+                        ? const Center(child: Text('No requests available'))
+                        : Expanded(
+                            child: ListView.builder(
+                              itemCount: requests.length,
+                              itemBuilder: (context, index) {
+                                final request = requests[index];
+                                return Card(
+                                  elevation: 3,
+                                  margin: const EdgeInsets.all(8),
+                                  child: ListTile(
+                                    title:
+                                        Text('Request: ${request['request']}'),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text('Status: ${request['Status']}'),
+                                        Text('Date: ${request['date']}'),
+                                        Text(
+                                            'Location: ${request['latitude']}, ${request['longitude']}'),
+                                      ],
+                                    ),
+                                    trailing:
+                                        const Icon(Icons.arrow_forward_ios),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
                 // const SizedBox(height: 10),
                 // const Text(
                 //   "Press the button below, help will reach you soon.",
