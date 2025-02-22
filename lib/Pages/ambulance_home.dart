@@ -267,18 +267,34 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : requests.isEmpty
-                        ? const Center(child: Text('No requests available'))
-                        : Expanded(
-                            child: ListView.builder(
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.4,
+                  margin: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 5,
+                        spreadRadius: 1,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : requests.isEmpty
+                          ? const Center(child: Text('No requests available'))
+                          : ListView.builder(
+                              padding: const EdgeInsets.all(8),
                               itemCount: requests.length,
                               itemBuilder: (context, index) {
                                 final request = requests[index];
                                 return Card(
-                                  elevation: 3,
-                                  margin: const EdgeInsets.all(8),
+                                  elevation: 2,
+                                  margin:
+                                      const EdgeInsets.symmetric(vertical: 4),
                                   child: ListTile(
                                     title:
                                         Text('Request: ${request['request']}'),
@@ -304,7 +320,16 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                                 );
                               },
                             ),
-                          ),
+                ),
+
+                // Bottom half content
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      'Other content goes here',
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
