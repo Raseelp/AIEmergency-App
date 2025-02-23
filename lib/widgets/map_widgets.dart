@@ -599,6 +599,8 @@ Widget ambulanceMap(
   required VoidCallback toggleFullScreen,
   required bool ishelp,
   required VoidCallback toggleHelp,
+  required int? selectedIndex,
+  required Function(int) onMarkerTap,
 }) {
   return Column(
     mainAxisAlignment: MainAxisAlignment.center,
@@ -899,31 +901,33 @@ Widget ambulanceMap(
                                   request['latitude'] != null &&
                                   request['longitude'] != null)
                               .map(
-                                (request) => Marker(
-                                  point: LatLng(
-                                    double.parse(request['latitude']),
-                                    double.parse(request['longitude']),
-                                  ),
-                                  width: 60,
-                                  height: 60,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      // _showRequestDetailsTopModelSheet(
-                                      //     context, request);
-                                    },
-                                    child: Icon(
-                                      Icons.emoji_people_rounded,
-                                      color: request['Status'] == 'Requested'
-                                          ? Colors.red
-                                          : request['Status'] == 'Accepted'
-                                              ? Colors.blue
-                                              : Colors.green,
-                                      size: 40,
-                                    ),
+                            (request) {
+                              int index = ambulanceRequests.indexOf(request);
+                              bool isSelected = index == selectedIndex;
+                              return Marker(
+                                point: LatLng(
+                                  double.parse(request['latitude']),
+                                  double.parse(request['longitude']),
+                                ),
+                                width: isSelected ? 80 : 60,
+                                height: isSelected ? 80 : 60,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    onMarkerTap(index);
+                                  },
+                                  child: Icon(
+                                    Icons.emoji_people_rounded,
+                                    color: request['Status'] == 'Requested'
+                                        ? Colors.red
+                                        : request['Status'] == 'Completed'
+                                            ? Colors.blue
+                                            : Colors.green,
+                                    size: isSelected ? 50 : 40,
                                   ),
                                 ),
-                              )
-                              .toList(),
+                              );
+                            },
+                          ).toList(),
                         ),
                         MarkerLayer(markers: [
                           Marker(

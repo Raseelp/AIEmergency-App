@@ -29,6 +29,7 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
   final List<String> items = ['Available', 'Unavailable']; // List of
   List<Map<String, dynamic>> requests = [];
   bool isLoading = false;
+  int? selectedIndex;
   LatLng? currentLocation = LatLng(11.2588, 75.7804);
   String _currentLocationStatus = "Press the button to get the location";
   final MapController _mapController = MapController();
@@ -280,6 +281,12 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
     }
   }
 
+  void _onMarkerTap(int index) {
+    setState(() {
+      selectedIndex = index;
+    });
+  }
+
   @override
   void initState() {
     fetchAmbulanceRequests();
@@ -294,6 +301,8 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
     return _isFullScreen
         ? Scaffold(
             body: ambulanceMap(fetchAmbulanceRequests(),
+                onMarkerTap: _onMarkerTap,
+                selectedIndex: selectedIndex,
                 currentLocation: currentLocation,
                 ambulanceRequests: requests,
                 getcurrentLocation: _getCurrentLocationRequests(),
@@ -323,7 +332,7 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                 ),
               ],
             ),
-            drawer: const AmbulanceDraweClass(), // Drawer integration
+            drawer: const AmbulanceDraweClass(),
             body: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -380,77 +389,92 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                                     itemCount: requests.length,
                                     itemBuilder: (context, index) {
                                       final request = requests[index];
-                                      return Card(
-                                        elevation: 2,
-                                        margin: const EdgeInsets.symmetric(
-                                            vertical: 4),
-                                        child: ListTile(
-                                          title: Text(
-                                              'Request: ${request['request']}'),
-                                          subtitle: Row(
-                                            children: [
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                        'Status: ${request['Status']}'),
-                                                    Text(
-                                                        'Date: ${request['date']}'),
-                                                    Text(
-                                                        'Location: ${request['latitude']}, ${request['longitude']}'),
-                                                  ],
+                                      return GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            selectedIndex =
+                                                index; // Store the index of clicked tile
+                                          });
+                                        },
+                                        child: Card(
+                                          color: selectedIndex == index
+                                              ? Colors.blue[
+                                                  100] // Highlighted color
+                                              : Colors.white, // Default color
+                                          elevation: 2,
+                                          margin: const EdgeInsets.symmetric(
+                                              vertical: 4),
+                                          child: ListTile(
+                                            title: Text(
+                                                'Request: ${request['request']}'),
+                                            subtitle: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                          'Status: ${request['Status']}'),
+                                                      Text(
+                                                          'Date: ${request['date']}'),
+                                                      Text(
+                                                          'Location: ${request['latitude']}, ${request['longitude']}'),
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                              request['Status'] == 'Requested'
-                                                  ? ElevatedButton(
-                                                      onPressed: () =>
-                                                          acceptRequest(
-                                                              request['id']),
-                                                      child:
-                                                          const Text('Accept'),
-                                                    )
-                                                  : request['Status']
-                                                          .toString()
-                                                          .startsWith(
-                                                              'Accepted')
-                                                      ? Column(
-                                                          children: [
-                                                            const Padding(
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .all(10),
-                                                              child: Icon(
-                                                                  Icons
-                                                                      .check_circle,
-                                                                  color: Colors
-                                                                      .blue),
-                                                            ),
-                                                            ElevatedButton(
-                                                              onPressed: () =>
-                                                                  completeRequest(
-                                                                      request[
-                                                                          'id']),
-                                                              child: const Text(
-                                                                  'Completed'),
-                                                            ),
-                                                          ],
-                                                        )
-                                                      : const Icon(
-                                                          Icons.check_circle,
-                                                          color: Colors.green)
-                                            ],
+                                                request['Status'] == 'Requested'
+                                                    ? ElevatedButton(
+                                                        onPressed: () =>
+                                                            acceptRequest(
+                                                                request['id']),
+                                                        child: const Text(
+                                                            'Accept'),
+                                                      )
+                                                    : request['Status']
+                                                            .toString()
+                                                            .startsWith(
+                                                                'Accepted')
+                                                        ? Column(
+                                                            children: [
+                                                              const Padding(
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .all(
+                                                                            10),
+                                                                child: Icon(
+                                                                    Icons
+                                                                        .check_circle,
+                                                                    color: Colors
+                                                                        .blue),
+                                                              ),
+                                                              ElevatedButton(
+                                                                onPressed: () =>
+                                                                    completeRequest(
+                                                                        request[
+                                                                            'id']),
+                                                                child: const Text(
+                                                                    'Completed'),
+                                                              ),
+                                                            ],
+                                                          )
+                                                        : const Icon(
+                                                            Icons.check_circle,
+                                                            color: Colors.green)
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       );
                                     },
                                   ),
                       ),
-
                       // Bottom half content
                       Expanded(
                           child: ambulanceMap(fetchAmbulanceRequests(),
+                              onMarkerTap: _onMarkerTap,
+                              selectedIndex: selectedIndex,
                               currentLocation: currentLocation,
                               ambulanceRequests: requests,
                               getcurrentLocation: _getCurrentLocationRequests(),
