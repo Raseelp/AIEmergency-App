@@ -417,6 +417,15 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                                             selectedIndex =
                                                 index; // Store the index of clicked tile
                                           });
+
+                                          LatLng destination = LatLng(
+                                            double.parse(request['latitude']),
+                                            double.parse(request['longitude']),
+                                          );
+
+                                          // Fetch route to the selected location
+                                          fetchRoute(
+                                              currentLocation, destination);
                                         },
                                         child: Card(
                                           color: selectedIndex == index
