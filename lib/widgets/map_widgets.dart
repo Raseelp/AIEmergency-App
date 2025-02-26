@@ -653,11 +653,21 @@ Widget ambulanceMap(
                         ),
                         PolylineLayer(
                           polylines: [
-                            Polyline(
-                              points: routeCoordinates,
-                              strokeWidth: 5.0,
-                              color: Colors.blue,
-                            ),
+                            if (selectedIndex != null &&
+                                selectedIndex < ambulanceRequests.length)
+                              Polyline(
+                                points: routeCoordinates,
+                                strokeWidth: 10.0,
+                                color: ambulanceRequests[selectedIndex]
+                                            ['Status'] ==
+                                        'Requested'
+                                    ? Colors.red
+                                    : ambulanceRequests[selectedIndex]
+                                                ['Status'] ==
+                                            'Completed'
+                                        ? Colors.blue
+                                        : Colors.green,
+                              ),
                           ],
                         ),
                         MarkerLayer(
@@ -939,11 +949,21 @@ Widget ambulanceMap(
                         ),
                         PolylineLayer(
                           polylines: [
-                            Polyline(
-                              points: routeCoordinates,
-                              strokeWidth: 5.0,
-                              color: Colors.blue,
-                            ),
+                            if (selectedIndex != null &&
+                                selectedIndex < ambulanceRequests.length)
+                              Polyline(
+                                points: routeCoordinates,
+                                strokeWidth: 7.0,
+                                color: ambulanceRequests[selectedIndex]
+                                            ['Status'] ==
+                                        'Requested'
+                                    ? Colors.red
+                                    : ambulanceRequests[selectedIndex]
+                                                ['Status'] ==
+                                            'Completed'
+                                        ? Colors.blue
+                                        : Colors.green,
+                              ),
                           ],
                         ),
                         MarkerLayer(
