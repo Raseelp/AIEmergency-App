@@ -33,8 +33,9 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
   LatLng? currentLocation = LatLng(11.2588, 75.7804);
   String _currentLocationStatus = "Press the button to get the location";
   final MapController _mapController = MapController();
-
   bool _isFullScreen = false;
+
+  List<LatLng> routeCoordinates = [];
 
   void _toggleFullScreen() {
     setState(() {
@@ -48,6 +49,25 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
     setState(() {
       _isHelp = !_isHelp;
     });
+  }
+
+  Future<void> fetchRoute(LatLng? start, LatLng end) async {
+    final url = Uri.parse(
+        'https://router.project-osrm.org/route/v1/driving/${start?.longitude},${start?.latitude};${end.longitude},${end.latitude}?overview=full&geometries=geojson');
+
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final List coordinates = data['routes'][0]['geometry']['coordinates'];
+
+      setState(() {
+        routeCoordinates = coordinates
+            .map((coord) => LatLng(coord[1], coord[0])) // Convert to LatLng
+            .toList();
+      });
+    } else {
+      print("Failed to load route");
+    }
   }
 
   Future<void> _getCurrentLocationRequests() async {
@@ -301,6 +321,8 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
     return _isFullScreen
         ? Scaffold(
             body: ambulanceMap(fetchAmbulanceRequests(),
+                routeCoordinates: routeCoordinates,
+                fetchRoute: fetchRoute,
                 onMarkerTap: _onMarkerTap,
                 selectedIndex: selectedIndex,
                 currentLocation: currentLocation,
@@ -470,9 +492,10 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                                     },
                                   ),
                       ),
-                      // Bottom half content
                       Expanded(
                           child: ambulanceMap(fetchAmbulanceRequests(),
+                              routeCoordinates: routeCoordinates,
+                              fetchRoute: fetchRoute,
                               onMarkerTap: _onMarkerTap,
                               selectedIndex: selectedIndex,
                               currentLocation: currentLocation,
