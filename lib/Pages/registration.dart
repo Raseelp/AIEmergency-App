@@ -56,10 +56,10 @@ class _RegistrationState extends State<Registration> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
                       controller: fnameController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         fillColor: Colors.white,
                         border: OutlineInputBorder(),
                         hintText: "First Name",
@@ -72,23 +72,6 @@ class _RegistrationState extends State<Registration> {
                       },
                     ),
                   ),
-                  // Padding(
-                  //   padding: EdgeInsets.all(8.0),
-                  //   child: TextFormField(
-                  //     controller: lnameController,
-                  //     decoration: InputDecoration(
-                  //       fillColor: Colors.white,
-                  //       border: OutlineInputBorder(),
-                  //       hintText: "Last Name",
-                  //     ),
-                  //     validator: (value) {
-                  //       if (value!.isEmpty) {
-                  //         return 'Please enter your last name';
-                  //       }
-                  //       return null; // Return null if the input is valid
-                  //     },
-                  //   ),
-                  // ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
@@ -107,10 +90,10 @@ class _RegistrationState extends State<Registration> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
                       controller: postController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         fillColor: Colors.white,
                         border: OutlineInputBorder(),
                         hintText: "post",
@@ -124,10 +107,10 @@ class _RegistrationState extends State<Registration> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
                       controller: pinController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         fillColor: Colors.white,
                         border: OutlineInputBorder(),
                         hintText: "pin",
@@ -136,35 +119,71 @@ class _RegistrationState extends State<Registration> {
                         if (value!.isEmpty) {
                           return 'Please enter your pin';
                         }
+                        if (value.length < 6) {
+                          return 'Please enter a valid pin';
+                        }
                         return null; // Return null if the input is valid
                       },
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
                       controller: phoneController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         fillColor: Colors.white,
                         border: OutlineInputBorder(),
                         hintText: "Phone",
                       ),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter your phoneNumber';
+                        }
+                        if (value.length < 10) {
+                          return 'Please enter a valid phone number';
+                        }
+                        if (value.length > 10) {
+                          return 'Please enter a valid phone number';
+                        }
+                        if (value.contains(RegExp(r'[A-Z]'))) {
+                          return 'Please enter a valid phone number';
+                        }
+                        if (value.contains(RegExp(r'[a-z]'))) {
+                          return 'Please enter a valid phone number';
+                        }
+
+                        return null; // Return null if the input is valid
+                      },
                     ),
                   ),
                   Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: TextFormField(
-                          controller: emailController,
-                          decoration: InputDecoration(
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(),
-                            hintText: "Email",
-                          ))),
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextFormField(
+                      controller: emailController,
+                      decoration: const InputDecoration(
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(),
+                        hintText: "Email",
+                      ),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return '`Please enter your email address';
+                        }
+                        if (!value.contains('@')) {
+                          return 'Email must contain @';
+                        }
+                        if (!value.contains('.')) {
+                          return 'Email must contain .';
+                        }
+                        return null; // Return null if the input is valid
+                      },
+                    ),
+                  ),
                   Padding(
-                      padding: EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
                         controller: usernameController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           fillColor: Colors.white,
                           border: OutlineInputBorder(),
                           hintText: "Username",
@@ -177,10 +196,10 @@ class _RegistrationState extends State<Registration> {
                         },
                       )),
                   Padding(
-                      padding: EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
                         controller: passwordController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           fillColor: Colors.white,
                           border: OutlineInputBorder(),
                           hintText: "Password",
@@ -189,15 +208,18 @@ class _RegistrationState extends State<Registration> {
                           if (value!.isEmpty) {
                             return 'Please enter your password';
                           }
+                          if (value.length < 8) {
+                            return 'Password must be at least 8 characters long';
+                          }
+
                           return null; // Return null if the input is valid
                         },
                       )),
                   Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton.icon(
                       onPressed: () async {
                         if (!_formKey.currentState!.validate()) {
-                          print("vvvvvvvvvvvvvvvvvvv");
                         } else {
                           final sh = await SharedPreferences.getInstance();
                           String fname = fnameController.text.toString();

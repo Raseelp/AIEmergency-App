@@ -110,27 +110,32 @@ class _loginState extends State<login> {
                         if (type == 'user') {
                           String lid = jasondata['lid'].toString();
                           sh.setString("lid", lid);
-                          // Navigator.push(context,
-                          //     MaterialPageRoute(
-                          //         builder: (context) => sapp()));
 
                           Navigator.push(context,
                               MaterialPageRoute(builder: (context) => Home()));
                         } else if (type == 'ambulance') {
                           String lid = jasondata['lid'].toString();
                           sh.setString("lid", lid);
-                          // Navigator.push(context,
-                          //     MaterialPageRoute(builder: (context) => AmbPP()));
 
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => AmbulanceHome()));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AmbulanceHome(),
+                            ),
+                          );
                         } else {
                           print("error");
                         }
                       } else {
-                        print("error");
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              "Username And Password Does Not Match",
+                            ),
+                            backgroundColor: Colors.red,
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
                       }
                     },
                     style: ElevatedButton.styleFrom(
