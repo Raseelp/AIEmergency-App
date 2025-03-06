@@ -140,16 +140,16 @@ class _RegistrationState extends State<Registration> {
                           return 'Please enter your phoneNumber';
                         }
                         if (value.length < 10) {
-                          return 'Please enter a valid phone number';
+                          return 'Phone number length must be Ten';
                         }
                         if (value.length > 10) {
-                          return 'Please enter a valid phone number';
+                          return 'Phone number length must be Ten';
                         }
                         if (value.contains(RegExp(r'[A-Z]'))) {
-                          return 'Please enter a valid phone number';
+                          return 'Phone Number Shouldnt contain letters';
                         }
                         if (value.contains(RegExp(r'[a-z]'))) {
-                          return 'Please enter a valid phone number';
+                          return 'Phone Number Shouldnt contain letters';
                         }
 
                         return null; // Return null if the input is valid
@@ -254,7 +254,7 @@ class _RegistrationState extends State<Registration> {
                           if (status == "valid") {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: const Text(
+                                content: Text(
                                     "Registration Successful! You can now log in."),
                                 backgroundColor: Colors.green,
                                 duration: Duration(seconds: 2),

@@ -221,7 +221,9 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(
+            content: Text('Error: $e'),
+          ),
         );
       }
     } else {
