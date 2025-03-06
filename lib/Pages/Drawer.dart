@@ -1,12 +1,10 @@
+import 'package:flutter/material.dart';
+import 'home.dart';
+import 'login.dart';
 import 'package:emergency_vehicle/Pages/send%20alert.dart';
 import 'package:emergency_vehicle/Pages/send_feedback.dart';
 import 'package:emergency_vehicle/Pages/view_nearest_ambulances.dart';
-import 'package:emergency_vehicle/widgets/map_widgets.dart';
-import 'package:flutter/material.dart';
-
 import 'Viewtrafficnoti.dart';
-import 'home.dart';
-import 'login.dart';
 
 class Drawerclass extends StatelessWidget {
   const Drawerclass({Key? key}) : super(key: key);
@@ -16,19 +14,45 @@ class Drawerclass extends StatelessWidget {
     return Drawer(
       child: Column(
         children: [
-          const UserAccountsDrawerHeader(
-            accountName: Text("User"),
-            accountEmail: Text("user@example.com"),
-            currentAccountPicture: CircleAvatar(
-              backgroundColor: Colors.white,
-              child: Icon(Icons.person, size: 50, color: Colors.blueAccent),
+          // Profile Section
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 16),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                bottom: BorderSide(color: Colors.grey, width: 0.5),
+              ),
             ),
-            decoration: BoxDecoration(
-              color: Colors.blueAccent,
+            child: Row(
+              children: [
+                const CircleAvatar(
+                  radius: 30,
+                  backgroundColor: Colors.blueAccent,
+                  child: Icon(Icons.person, size: 35, color: Colors.white),
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      "User",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      "user@example.com",
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
+
+          // Drawer Items
           Expanded(
             child: ListView(
+              padding: EdgeInsets.zero,
               children: [
                 _buildDrawerItem(context, Icons.home, "Home", Home()),
                 _buildDrawerItem(context, Icons.local_hospital,
@@ -39,7 +63,7 @@ class Drawerclass extends StatelessWidget {
                     "Traffic Notifications", ViewNearestNotification()),
                 _buildDrawerItem(
                     context, Icons.feedback, "Send Feedback", SendFeedback()),
-                Divider(),
+                const Divider(thickness: 1, indent: 16, endIndent: 16),
                 _buildDrawerItem(context, Icons.logout, "Logout", const login(),
                     isLogout: true),
               ],
@@ -57,7 +81,16 @@ class Drawerclass extends StatelessWidget {
     Widget destination, {
     bool isLogout = false,
   }) {
-    return GestureDetector(
+    return ListTile(
+      leading: Icon(icon, color: isLogout ? Colors.redAccent : Colors.black54),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: isLogout ? FontWeight.w600 : FontWeight.w400,
+          color: isLogout ? Colors.redAccent : Colors.black,
+        ),
+      ),
       onTap: () {
         Navigator.push(
             context,
@@ -65,35 +98,8 @@ class Drawerclass extends StatelessWidget {
               builder: (context) => destination,
             ));
       },
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-          height: 50,
-          decoration: BoxDecoration(
-              color: Colors.blueAccent,
-              borderRadius: BorderRadius.circular(10)),
-          child: Padding(
-            padding: const EdgeInsets.all(
-              8.0,
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  icon,
-                  color: Colors.white,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    title,
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      hoverColor: Colors.blueAccent.withOpacity(0.1), // Subtle hover effect
     );
   }
 }
