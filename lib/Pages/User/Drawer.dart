@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'home.dart';
-import 'login.dart';
+import '../Auth/login.dart';
 import 'package:emergency_vehicle/Pages/send%20alert.dart';
-import 'package:emergency_vehicle/Pages/send_feedback.dart';
-import 'package:emergency_vehicle/Pages/view_nearest_ambulances.dart';
+import 'package:emergency_vehicle/Pages/User/send_feedback.dart';
+import 'package:emergency_vehicle/Pages/User/view_nearest_ambulances.dart';
 import 'Viewtrafficnoti.dart';
 
 class Drawerclass extends StatelessWidget {

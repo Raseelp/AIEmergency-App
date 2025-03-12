@@ -205,7 +205,7 @@ class _HomeState extends State<Home> {
     return _isFullScreen
         ? Scaffold(
             body: _isMapReady
-                ? UserMap(fetchedAmbulances, fetchAmbulances(),
+                ? userMap(fetchedAmbulances, fetchAmbulances(),
                     context: context,
                     getcurrentLocation: _getCurrentLocation(),
                     height: screenheight * 0.3,
@@ -360,7 +360,7 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                     _isMapReady
-                        ? UserMap(fetchedAmbulances, fetchAmbulances(),
+                        ? userMap(fetchedAmbulances, fetchAmbulances(),
                             context: context,
                             getcurrentLocation: _getCurrentLocation(),
                             height: screenheight * 0.3,

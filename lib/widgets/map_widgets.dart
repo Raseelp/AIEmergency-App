@@ -112,7 +112,7 @@ import 'package:latlong2/latlong.dart';
 //   }
 // }
 
-Widget UserMap(
+Widget userMap(
   List<Ambulance> ambulances,
   Future<void> refetchAmbulance, {
   required Future<void> getcurrentLocation,

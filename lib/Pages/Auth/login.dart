@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'package:emergency_vehicle/Pages/ambulance_home.dart';
-import 'package:emergency_vehicle/Pages/registration.dart';
+import 'package:emergency_vehicle/Pages/Ambulance/ambulance_home.dart';
+import 'package:emergency_vehicle/Pages/Auth/registration.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'home.dart';
+import '../User/home.dart';
 
 class login extends StatefulWidget {
   const login({super.key});

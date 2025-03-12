@@ -2,19 +2,18 @@ import 'package:flutter/material.dart';
 
 import 'Pages/ipset.dart';
 
-
 void main() {
-  runApp(const KSRTC());
+  runApp(const Ambulance());
 }
 
-class KSRTC extends StatefulWidget {
-  const KSRTC({super.key});
+class Ambulance extends StatefulWidget {
+  const Ambulance({super.key});
 
   @override
-  State<KSRTC> createState() => _KSRTCState();
+  State<Ambulance> createState() => _AmbulanceState();
 }
 
-class _KSRTCState extends State<KSRTC> {
+class _AmbulanceState extends State<Ambulance> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
