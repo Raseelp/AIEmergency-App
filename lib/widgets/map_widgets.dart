@@ -633,130 +633,114 @@ Widget ambulanceMap(
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: LayoutBuilder(builder: (context, constraints) {
-                      return OverflowBox(
-                          maxWidth:
-                              constraints.maxWidth * 10, // Safe finite size
-                          maxHeight: constraints.maxHeight * 10,
-                          child: Transform(
-                            transform: Matrix4.identity()
-                              ..setEntry(3, 2, 0.004) // Perspective depth
-                              ..rotateX(-0.5), // Adjust the tilt angle
-                            alignment: Alignment.center,
-                            child: FlutterMap(
-                              mapController: mapController,
-                              options: MapOptions(
-                                initialCenter: currentLocation ??
-                                    const LatLng(11.2588, 75.7804),
-                                maxZoom: 19,
-                                minZoom: 3,
-                                interactionOptions: const InteractionOptions(
-                                  flags: InteractiveFlag.all,
+                      return FlutterMap(
+                        mapController: mapController,
+                        options: MapOptions(
+                          initialCenter:
+                              currentLocation ?? const LatLng(11.2588, 75.7804),
+                          maxZoom: 19,
+                          minZoom: 3,
+                          interactionOptions: const InteractionOptions(
+                            flags: InteractiveFlag.all,
+                          ),
+                        ),
+                        children: [
+                          TileLayer(
+                            // urlTemplate:
+                            //     'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=010b64df977f45d5a757a2463c91ad9b',
+                            //This is the original url for the map,but commenting it out becouse dont want to run out limit while testing
+                            urlTemplate:
+                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          ),
+                          PolylineLayer(
+                            polylines: [
+                              if (selectedIndex != null &&
+                                  selectedIndex < ambulanceRequests.length)
+                                Polyline(
+                                  points: routeCoordinates,
+                                  strokeWidth: 10.0,
+                                  color: ambulanceRequests[selectedIndex]
+                                              ['Status'] ==
+                                          'Requested'
+                                      ? Colors.red
+                                      : ambulanceRequests[selectedIndex]
+                                                  ['Status']
+                                              .toString()
+                                              .startsWith('Completed')
+                                          ? Colors.green
+                                          : Colors.blue,
                                 ),
-                              ),
-                              children: [
-                                TileLayer(
-                                  // urlTemplate:
-                                  //     'https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=010b64df977f45d5a757a2463c91ad9b',
-                                  //This is the original url for the map,but commenting it out becouse dont want to run out limit while testing
-                                  urlTemplate:
-                                      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                            ],
+                          ),
+                          MarkerLayer(
+                            markers: ambulanceRequests
+                                .where((request) =>
+                                    request['latitude'] != null &&
+                                    request['longitude'] != null)
+                                .map((request) {
+                              int index = ambulanceRequests.indexOf(request);
+                              bool isSelected = index == selectedIndex;
+                              return Marker(
+                                point: LatLng(
+                                  double.parse(request['latitude']),
+                                  double.parse(request['longitude']),
                                 ),
-                                PolylineLayer(
-                                  polylines: [
-                                    if (selectedIndex != null &&
-                                        selectedIndex <
-                                            ambulanceRequests.length)
-                                      Polyline(
-                                        points: routeCoordinates,
-                                        strokeWidth: 10.0,
-                                        color: ambulanceRequests[selectedIndex]
-                                                    ['Status'] ==
-                                                'Requested'
-                                            ? Colors.red
-                                            : ambulanceRequests[selectedIndex]
-                                                        ['Status']
-                                                    .toString()
-                                                    .startsWith('Completed')
-                                                ? Colors.green
-                                                : Colors.blue,
-                                      ),
-                                  ],
-                                ),
-                                MarkerLayer(
-                                  markers: ambulanceRequests
-                                      .where((request) =>
-                                          request['latitude'] != null &&
-                                          request['longitude'] != null)
-                                      .map((request) {
-                                    int index =
-                                        ambulanceRequests.indexOf(request);
-                                    bool isSelected = index == selectedIndex;
-                                    return Marker(
-                                      point: LatLng(
+                                width: isSelected ? 80 : 60,
+                                height: isSelected ? 80 : 60,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    fetchRoute(
+                                      currentLocation,
+                                      LatLng(
                                         double.parse(request['latitude']),
-                                        double.parse(request['longitude']),
-                                      ),
-                                      width: isSelected ? 80 : 60,
-                                      height: isSelected ? 80 : 60,
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          print(index);
-                                          print(selectedIndex);
-                                          print(isSelected);
-                                          fetchRoute(
-                                            currentLocation,
-                                            LatLng(
-                                              double.parse(request['latitude']),
-                                              double.parse(
-                                                request['longitude'],
-                                              ),
-                                            ),
-                                          );
-                                          onMarkerTap(index);
-                                          _showRequestDetailsTopModelSheet(
-                                              context, request);
-                                        },
-                                        child: Icon(
-                                          Icons.emoji_people_rounded,
-                                          color: request['Status'] ==
-                                                  'Requested'
-                                              ? Colors.red
-                                              : request['Status']
-                                                      .toString()
-                                                      .startsWith('Completed')
-                                                  ? Colors.green
-                                                  : Colors.blue,
+                                        double.parse(
+                                          request['longitude'],
                                         ),
                                       ),
                                     );
-                                  }).toList(),
+                                    onMarkerTap(index);
+                                    _showRequestDetailsTopModelSheet(
+                                        context, request);
+                                  },
+                                  child: Icon(
+                                    Icons.emoji_people_rounded,
+                                    color: request['Status'] == 'Requested'
+                                        ? Colors.red
+                                        : request['Status']
+                                                .toString()
+                                                .startsWith('Completed')
+                                            ? Colors.green
+                                            : Colors.blue,
+                                  ),
                                 ),
-                                MarkerLayer(markers: [
-                                  Marker(
-                                    height: 50,
-                                    width: 50,
-                                    point: currentLocation ??
-                                        const LatLng(11.2588, 75.7804),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.blue.withOpacity(0.6),
-                                            blurRadius: 20,
-                                            spreadRadius: 5,
-                                          ),
-                                        ],
-                                      ),
-                                      child: Image.asset(
-                                        'asset/amb_icon.png',
-                                      ),
+                              );
+                            }).toList(),
+                          ),
+                          MarkerLayer(markers: [
+                            Marker(
+                              height: 50,
+                              width: 50,
+                              point: currentLocation ??
+                                  const LatLng(11.2588, 75.7804),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.blue.withOpacity(0.6),
+                                      blurRadius: 20,
+                                      spreadRadius: 5,
                                     ),
-                                  )
-                                ])
-                              ],
-                            ),
-                          ));
+                                  ],
+                                ),
+                                child: Image.asset(
+                                  'asset/amb_icon.png',
+                                ),
+                              ),
+                            )
+                          ])
+                        ],
+                      );
                     }),
                   ),
                   Positioned(

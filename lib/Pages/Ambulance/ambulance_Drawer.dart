@@ -1,5 +1,5 @@
 import 'package:emergency_vehicle/Pages/Ambulance/ambulance_home.dart';
-import 'package:emergency_vehicle/Pages/send%20alert.dart';
+
 import 'package:emergency_vehicle/Pages/User/send_feedback.dart';
 import 'package:emergency_vehicle/Pages/Ambulance/send_patient_info.dart';
 import 'package:emergency_vehicle/Pages/Ambulance/view_hospital_message_ambulanced.dart';
@@ -11,7 +11,7 @@ import '../User/home.dart';
 import '../Auth/login.dart';
 
 class AmbulanceDraweClass extends StatelessWidget {
-  const AmbulanceDraweClass({Key? key}) : super(key: key);
+  const AmbulanceDraweClass({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,19 +32,20 @@ class AmbulanceDraweClass extends StatelessWidget {
           Expanded(
             child: ListView(
               children: [
-                _buildDrawerItem(context, Icons.home, "Home", AmbulanceHome()),
+                _buildDrawerItem(
+                    context, Icons.home, "Home", const AmbulanceHome()),
                 _buildDrawerItem(
                     context,
                     Icons.local_hospital,
                     "View Messages From Hospital",
-                    ViewAmbulanceMessgaepagePage(
+                    const ViewAmbulanceMessgaepagePage(
                       title: '',
                     )),
                 _buildDrawerItem(context, Icons.notification_important,
                     "Send Patient Info To Hosptital", SendPatientInfo()),
                 _buildDrawerItem(context, Icons.feedback,
                     "Ambulance Location Updation", SendFeedback()),
-                Divider(),
+                const Divider(),
                 _buildDrawerItem(context, Icons.logout, "Logout", const login(),
                     isLogout: true),
               ],
@@ -91,7 +92,7 @@ class AmbulanceDraweClass extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     title,
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                    style: const TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 )
               ],
