@@ -3,11 +3,8 @@ import 'package:emergency_vehicle/Pages/Ambulance/ambulance_home.dart';
 import 'package:emergency_vehicle/Pages/User/send_feedback.dart';
 import 'package:emergency_vehicle/Pages/Ambulance/send_patient_info.dart';
 import 'package:emergency_vehicle/Pages/Ambulance/view_hospital_message_ambulanced.dart';
-import 'package:emergency_vehicle/Pages/User/view_nearest_ambulances.dart';
 import 'package:flutter/material.dart';
 
-import '../User/Viewtrafficnoti.dart';
-import '../User/home.dart';
 import '../Auth/login.dart';
 
 class AmbulanceDraweClass extends StatelessWidget {

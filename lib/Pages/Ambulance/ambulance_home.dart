@@ -51,6 +51,30 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
     });
   }
 
+  Future<void> deleteRequest(int requestId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String? url = prefs.getString('url');
+
+    try {
+      final response = await http.post(
+        Uri.parse(url! + 'delete_ambulance_request'),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({'id': requestId}),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          requests.removeWhere((request) => request['id'] == requestId);
+        });
+      } else {
+        print('Failed to delete request: ${response.body}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
   Future<void> fetchRoute(LatLng? start, LatLng end) async {
     final url = Uri.parse(
         'https://router.project-osrm.org/route/v1/driving/${start?.longitude},${start?.latitude};${end.longitude},${end.latitude}?overview=full&geometries=geojson');
@@ -208,9 +232,10 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
           final result = jsonDecode(response.body)['status'];
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text(result == 'Completed'
-                    ? 'Request completed successfully'
-                    : result)),
+              content: Text(result == 'Completed'
+                  ? 'Request completed successfully'
+                  : result),
+            ),
           );
           fetchAmbulanceRequests(); // Refresh requests after completion
         } else {
@@ -407,10 +432,13 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                             ? const Center(child: CircularProgressIndicator())
                             : requests.isEmpty
                                 ? const Center(
-                                    child: Text('No requests available',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500)))
+                                    child: Text(
+                                      'No requests available',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  )
                                 : ListView.builder(
                                     padding: const EdgeInsets.all(8),
                                     itemCount: requests.length,
@@ -422,12 +450,10 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                                       return GestureDetector(
                                         onTap: () {
                                           setState(() => selectedIndex = index);
-
                                           LatLng destination = LatLng(
                                             double.parse(request['latitude']),
                                             double.parse(request['longitude']),
                                           );
-
                                           fetchRoute(
                                               currentLocation, destination);
                                         },
@@ -455,6 +481,7 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                                           ),
                                           child: Row(
                                             children: [
+                                              // Status Icon
                                               Container(
                                                 padding:
                                                     const EdgeInsets.all(10),
@@ -487,6 +514,8 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                                                 ),
                                               ),
                                               const SizedBox(width: 12),
+
+                                              // Request Details
                                               Expanded(
                                                 child: Column(
                                                   crossAxisAlignment:
@@ -532,6 +561,8 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                                                   ],
                                                 ),
                                               ),
+
+                                              // Action Buttons
                                               if (status == 'Requested')
                                                 OutlinedButton(
                                                   onPressed: () =>
@@ -550,7 +581,8 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                                                   .startsWith('Accepted'))
                                                 Column(
                                                   children: [
-                                                    Icon(Icons.check_circle,
+                                                    const Icon(
+                                                        Icons.check_circle,
                                                         color: Colors.blue),
                                                     const SizedBox(height: 6),
                                                     OutlinedButton(
@@ -571,8 +603,22 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                                                   ],
                                                 )
                                               else
-                                                const Icon(Icons.check_circle,
-                                                    color: Colors.green),
+                                                Row(
+                                                  children: [
+                                                    const Icon(
+                                                        Icons.check_circle,
+                                                        color: Colors.green),
+                                                    const SizedBox(width: 8),
+                                                    IconButton(
+                                                      icon: const Icon(
+                                                          Icons.delete,
+                                                          color: Colors.red),
+                                                      onPressed: () =>
+                                                          deleteRequest(
+                                                              request['id']),
+                                                    ),
+                                                  ],
+                                                ),
                                             ],
                                           ),
                                         ),
@@ -581,22 +627,23 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                                   ),
                       ),
                       Expanded(
-                          child: ambulanceMap(fetchAmbulanceRequests(),
-                              routeCoordinates: routeCoordinates,
-                              fetchRoute: fetchRoute,
-                              onMarkerTap: _onMarkerTap,
-                              selectedIndex: selectedIndex,
-                              currentLocation: currentLocation,
-                              ambulanceRequests: requests,
-                              getcurrentLocation: _getCurrentLocationRequests(),
-                              height: screenheight * 0.3,
-                              width: screenwidth,
-                              mapController: _mapController,
-                              context: context,
-                              isFullScreen: _isFullScreen,
-                              toggleFullScreen: _toggleFullScreen,
-                              ishelp: _isHelp,
-                              toggleHelp: _toggleHelp)),
+                        child: ambulanceMap(fetchAmbulanceRequests(),
+                            routeCoordinates: routeCoordinates,
+                            fetchRoute: fetchRoute,
+                            onMarkerTap: _onMarkerTap,
+                            selectedIndex: selectedIndex,
+                            currentLocation: currentLocation,
+                            ambulanceRequests: requests,
+                            getcurrentLocation: _getCurrentLocationRequests(),
+                            height: screenheight * 0.3,
+                            width: screenwidth,
+                            mapController: _mapController,
+                            context: context,
+                            isFullScreen: _isFullScreen,
+                            toggleFullScreen: _toggleFullScreen,
+                            ishelp: _isHelp,
+                            toggleHelp: _toggleHelp),
+                      ),
                     ],
                   ),
                 ),
