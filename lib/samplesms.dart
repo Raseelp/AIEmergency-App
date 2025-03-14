@@ -6,17 +6,17 @@ void main() async {
 
   // Initialize the notification plugin
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   // Request notification permission for Android 14+
   await _requestNotificationPermission(flutterLocalNotificationsPlugin);
 
   // Initialize settings for Android notifications
   const AndroidInitializationSettings initializationSettingsAndroid =
-  AndroidInitializationSettings('@mipmap/ic_launcher');
+      AndroidInitializationSettings('@mipmap/ic_launcher');
 
   final InitializationSettings initializationSettings =
-  InitializationSettings(android: initializationSettingsAndroid);
+      InitializationSettings(android: initializationSettingsAndroid);
 
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
@@ -24,26 +24,25 @@ void main() async {
 }
 
 // Request notification permission (Android 14+)
-Future<void> _requestNotificationPermission(
-  //   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
-  // final bool? permissionGranted =await flutterLocalNotificationsPlugin.requestPermission();
-  //
-  // if (permissionGranted != null && permissionGranted) {
-  //   print("Notification permission granted");
-  // } else {
-  //   print("Notification permission denied");==-
-  // }
-}
+// Future<void> _requestNotificationPermission(
+//   //   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
+//   // final bool? permissionGranted =await flutterLocalNotificationsPlugin.requestPermission();
+//   //
+//   // if (permissionGranted != null && permissionGranted) {
+//   //   print("Notification permission granted");
+//   // } else {
+//   //   print("Notification permission denied");==-
+//   // }
+// }
 
 // Show a test notification
 Future<void> showNotification(
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
-  var androidDetails =const  AndroidNotificationDetails(
+  var androidDetails = const AndroidNotificationDetails(
     'your_channel_id',
     'your_channel_name',
     importance: Importance.high,
     priority: Priority.high,
-
   );
 
   var platformDetails = NotificationDetails(android: androidDetails);
@@ -79,8 +78,9 @@ class MyHomePage extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
           onPressed: () async {
-            final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-            FlutterLocalNotificationsPlugin();
+            final FlutterLocalNotificationsPlugin
+                flutterLocalNotificationsPlugin =
+                FlutterLocalNotificationsPlugin();
             await showNotification(flutterLocalNotificationsPlugin);
           },
           child: Text('Show Notification'),

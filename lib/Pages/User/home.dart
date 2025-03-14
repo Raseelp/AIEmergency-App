@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:emergency_vehicle/Pages/models/ambulance_mode.dart';
 import 'package:emergency_vehicle/widgets/map_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -9,6 +11,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
 
 import 'Drawer.dart'; // Ensure you import your Drawer class
 
@@ -30,11 +33,19 @@ class _HomeState extends State<Home> {
   LatLng? currentLocation = LatLng(11.2588, 75.7804);
   List<Ambulance> fetchedAmbulances = [];
   bool _isMapReady = false;
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  Timer? _ambulanceTimer;
 
   @override
   void initState() {
     _fetchambulancesOnInit();
+    _ambulanceTimer=Timer.periodic(const Duration(seconds: 3), (timer) {
+      loadnot();
+    },);
+
     showUsername();
+    initializeNotifications();
+
     Future.delayed(const Duration(milliseconds: 300), () {
       setState(() {
         _isMapReady = true;
@@ -43,8 +54,44 @@ class _HomeState extends State<Home> {
     super.initState();
   }
 
+  Future<void> initializeNotifications() async {
+    const AndroidInitializationSettings androidInitializationSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const InitializationSettings initializationSettings = InitializationSettings(android: androidInitializationSettings);
+
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+    // Request notification permission for Android 13+
+    if (await Permission.notification.isDenied) {
+      await Permission.notification.request();
+    }
+  }
+  Future<void> showNotification(String title, String body) async {
+    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+      'ambulance_channel_id',
+      'Ambulance Notifications',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+
+    const NotificationDetails platformDetails = NotificationDetails(android: androidDetails);
+
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      title,
+      body,
+      platformDetails,
+    );
+  }
+
   Future<void> _fetchambulancesOnInit() async {
     await fetchAmbulances();
+
+    // Future.delayed(const Duration(milliseconds: 300), () {
+    //   setState(()  {
+    //    loadnot();
+    //   });
+    // });
+
   }
 
   bool _isFullScreen = false;
@@ -377,5 +424,35 @@ class _HomeState extends State<Home> {
               ),
             ),
           );
+  }
+
+  Future<void> loadnot() async {
+    print("object");
+    SharedPreferences sh = await SharedPreferences.getInstance();
+    String? url = sh.getString('url');
+
+    final response =
+    await http.post(Uri.parse(url! + 'view_nearest_ambulances2'),body: {
+      'id':sh.getString("id").toString()
+
+
+    }) ;
+
+
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      if (data['status'] == 'ok') {
+        String id = data['id'].toString();
+        print('object${id}');
+        sh.setString("id", id);
+        await showNotification("New Ambulances Available!", "Passing..");
+
+      } else {
+        throw Exception('Failed to load ambulances: ${data['status']}');
+      }
+    } else {
+      throw Exception('Failed to load ambulances');
+    }
   }
 }
