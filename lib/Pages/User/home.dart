@@ -33,15 +33,19 @@ class _HomeState extends State<Home> {
   LatLng? currentLocation = LatLng(11.2588, 75.7804);
   List<Ambulance> fetchedAmbulances = [];
   bool _isMapReady = false;
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
   Timer? _ambulanceTimer;
 
   @override
   void initState() {
     _fetchambulancesOnInit();
-    _ambulanceTimer=Timer.periodic(const Duration(seconds: 3), (timer) {
-      loadnot();
-    },);
+    _ambulanceTimer = Timer.periodic(
+      const Duration(seconds: 3),
+      (timer) {
+        loadnot();
+      },
+    );
 
     showUsername();
     initializeNotifications();
@@ -55,8 +59,10 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> initializeNotifications() async {
-    const AndroidInitializationSettings androidInitializationSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings initializationSettings = InitializationSettings(android: androidInitializationSettings);
+    const AndroidInitializationSettings androidInitializationSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: androidInitializationSettings);
 
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
@@ -65,15 +71,18 @@ class _HomeState extends State<Home> {
       await Permission.notification.request();
     }
   }
+
   Future<void> showNotification(String title, String body) async {
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
       'ambulance_channel_id',
       'Ambulance Notifications',
       importance: Importance.high,
       priority: Priority.high,
     );
 
-    const NotificationDetails platformDetails = NotificationDetails(android: androidDetails);
+    const NotificationDetails platformDetails =
+        NotificationDetails(android: androidDetails);
 
     await flutterLocalNotificationsPlugin.show(
       0,
@@ -91,7 +100,6 @@ class _HomeState extends State<Home> {
     //    loadnot();
     //   });
     // });
-
   }
 
   bool _isFullScreen = false;
@@ -286,7 +294,7 @@ class _HomeState extends State<Home> {
                 ),
               ],
             ),
-            drawer: const Drawerclass(),
+            drawer: const UserDrawer(),
             body: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -431,14 +439,9 @@ class _HomeState extends State<Home> {
     SharedPreferences sh = await SharedPreferences.getInstance();
     String? url = sh.getString('url');
 
-    final response =
-    await http.post(Uri.parse(url! + 'view_nearest_ambulances2'),body: {
-      'id':sh.getString("id").toString()
-
-
-    }) ;
-
-
+    final response = await http.post(
+        Uri.parse(url! + 'view_nearest_ambulances2'),
+        body: {'id': sh.getString("id").toString()});
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
@@ -447,7 +450,6 @@ class _HomeState extends State<Home> {
         print('object${id}');
         sh.setString("id", id);
         await showNotification("New Ambulances Available!", "Passing..");
-
       } else {
         throw Exception('Failed to load ambulances: ${data['status']}');
       }

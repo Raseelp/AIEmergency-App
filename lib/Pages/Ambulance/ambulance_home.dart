@@ -381,7 +381,7 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                 ),
               ],
             ),
-            drawer: const AmbulanceDraweClass(),
+            drawer: const AmbulanceDrawer(),
             body: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -546,13 +546,6 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                                                     ),
                                                     Text(
                                                       'Date: ${request['date']}',
-                                                      style: TextStyle(
-                                                        color: Colors.grey[600],
-                                                        fontSize: 13,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      'Location: ${request['latitude']}, ${request['longitude']}',
                                                       style: TextStyle(
                                                         color: Colors.grey[600],
                                                         fontSize: 13,
