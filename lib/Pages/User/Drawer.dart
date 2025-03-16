@@ -1,12 +1,97 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'home.dart';
 import '../Auth/login.dart';
 import 'package:emergency_vehicle/Pages/User/send_feedback.dart';
 import 'package:emergency_vehicle/Pages/User/view_nearest_ambulances.dart';
 import 'Viewtrafficnoti.dart';
 
-class UserDrawer extends StatelessWidget {
+class UserDrawer extends StatefulWidget {
   const UserDrawer({Key? key}) : super(key: key);
+
+  @override
+  State<UserDrawer> createState() => _UserDrawerState();
+}
+
+class _UserDrawerState extends State<UserDrawer> {
+  String username = 'User';
+  String email = 'Example@gmail.com';
+  @override
+  void initState() {
+    showUsername();
+    showEmail();
+    super.initState();
+  }
+
+  Future<String?> getUsername() async {
+    SharedPreferences sh = await SharedPreferences.getInstance();
+    String? lid = sh.getString('lid');
+    String? url = sh.getString('url');
+    print(url);
+
+    try {
+      final response = await http.get(Uri.parse(url! + 'get-username/$lid/'));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        return data['username'];
+      } else {
+        print('Error: ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Exception: $e');
+      return null;
+    }
+  }
+
+  Future<void> showUsername() async {
+    String? fetchedUsername = await getUsername();
+    if (fetchedUsername != null) {
+      setState(() {
+        username = fetchedUsername;
+      });
+    } else {
+      print('User not found or error occurred');
+    }
+  }
+
+  Future<String?> getUserEmail() async {
+    SharedPreferences sh = await SharedPreferences.getInstance();
+    String? lid = sh.getString('lid');
+    String? url = sh.getString('url');
+    print(url);
+
+    try {
+      final response = await http.get(Uri.parse(url! + 'get-username/$lid/'));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        return data['email'];
+      } else {
+        print('Error: ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Exception: $e');
+      return null;
+    }
+  }
+
+  Future<void> showEmail() async {
+    String? fetchedEmail = await getUserEmail();
+    if (fetchedEmail != null) {
+      setState(() {
+        email = fetchedEmail;
+      });
+    } else {
+      print('User not found or error occurred');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,27 +107,28 @@ class UserDrawer extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(10),
               width: double.infinity,
-              child: const Column(
+              child: Column(
                 children: [
-                  CircleAvatar(
+                  const SizedBox(height: 20),
+                  const CircleAvatar(
                     radius: 40,
                     backgroundColor: Colors.white,
                     child:
                         Icon(Icons.person, size: 50, color: Colors.blueAccent),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Text(
-                    "User",
-                    style: TextStyle(
+                    username,
+                    style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.white),
                   ),
                   Text(
-                    "user@example.com",
-                    style: TextStyle(fontSize: 14, color: Colors.white70),
+                    email,
+                    style: const TextStyle(fontSize: 14, color: Colors.white70),
                   ),
                 ],
               ),

@@ -10,18 +10,14 @@ import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-import '../User/Drawer.dart'; // Ensure you import your Drawer class
-
 class AmbulanceHome extends StatefulWidget {
-  const AmbulanceHome({Key? key}) : super(key: key);
+  const AmbulanceHome({super.key});
 
   @override
   State<AmbulanceHome> createState() => _AmbulanceHomeState();
 }
 
 class _AmbulanceHomeState extends State<AmbulanceHome> {
-  String userAddress = "151-171 Montclair Ave, Newark, NJ 07104, USA";
-  // String userProfileImage = "assets/profile.jpg"; // Replace with actual image
   String? selectedAlert;
   String _currentLocation = "Press the button to get the location";
   double? _latitude;

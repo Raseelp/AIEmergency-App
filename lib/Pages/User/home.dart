@@ -29,7 +29,7 @@ class _HomeState extends State<Home> {
   String _currentLocationStatus = "Press the button to get the location";
   double? _latitude;
   double? _longitude;
-  String username = 'User';
+
   final MapController _mapController = MapController();
   LatLng? currentLocation = LatLng(11.2588, 75.7804);
   List<Ambulance> fetchedAmbulances = [];
@@ -48,7 +48,6 @@ class _HomeState extends State<Home> {
       },
     );
 
-    showUsername();
     initializeNotifications();
 
     Future.delayed(const Duration(milliseconds: 300), () {
@@ -117,39 +116,6 @@ class _HomeState extends State<Home> {
     setState(() {
       _isHelp = !_isHelp;
     });
-  }
-
-  Future<String?> getUsername() async {
-    SharedPreferences sh = await SharedPreferences.getInstance();
-    String? lid = sh.getString('lid');
-    String? url = sh.getString('url');
-    print(url);
-
-    try {
-      final response = await http.get(Uri.parse(url! + 'get-username/$lid/'));
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        return data['username'];
-      } else {
-        print('Error: ${response.body}');
-        return null;
-      }
-    } catch (e) {
-      print('Exception: $e');
-      return null;
-    }
-  }
-
-  Future<void> showUsername() async {
-    String? fetchedUsername = await getUsername();
-    if (fetchedUsername != null) {
-      setState(() {
-        username = fetchedUsername;
-      });
-    } else {
-      print('User not found or error occurred');
-    }
   }
 
   Future<void> sendSOSRequest() async {
