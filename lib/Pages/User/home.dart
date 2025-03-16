@@ -479,19 +479,17 @@ class _HomeState extends State<Home> {
                                             color: Colors.black87,
                                           ),
                                         ),
-                                        const SizedBox(
-                                            width:
-                                                8), // Spacing between text and circle
+                                        const SizedBox(width: 8),
                                         Container(
-                                          width: 10, // Small circular size
+                                          width: 10,
                                           height: 10,
                                           decoration: BoxDecoration(
-                                            color: Colors.red, // Red color
+                                            color: Colors.red,
                                             shape: BoxShape.circle,
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.red.withOpacity(
-                                                    0.6), // Glowing red
+                                                color:
+                                                    Colors.red.withOpacity(0.6),
                                                 blurRadius: 8,
                                                 spreadRadius: 3,
                                               ),
@@ -607,18 +605,28 @@ class _HomeState extends State<Home> {
   Future<void> loadnot() async {
     SharedPreferences sh = await SharedPreferences.getInstance();
     String? url = sh.getString('url');
+    String? storedstring = sh.getString("id");
+    print(storedstring);
+
+    if (storedstring == null || storedstring.isEmpty) {
+      print("Error: No valid ID stored in SharedPreferences");
+      sh.setString('id', '9');
+      return;
+    }
 
     final response = await http.post(
         Uri.parse(url! + 'view_nearest_ambulances2'),
-        body: {'id': sh.getString("id").toString()});
+        body: {'id': storedstring});
+    print(url! + 'view_nearest_ambulances2');
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       if (data['status'] == 'ok') {
         String id = data['id'].toString();
-        print('object${id}');
+
         sh.setString("id", id);
-        await showNotification("New Ambulances Available!", "Passing..");
+        await showNotification(" Emergency.... Ambulance Passing!",
+            "An ambulance is in your area. Move aside and make way immediately to assist in this emergency.");
       } else {
         throw Exception('Failed to load ambulances: ${data['status']}');
       }
