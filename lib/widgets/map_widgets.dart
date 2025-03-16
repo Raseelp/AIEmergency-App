@@ -728,7 +728,7 @@ Widget ambulanceMap(
                                   boxShadow: [
                                     BoxShadow(
                                       color: Colors.blue.withOpacity(0.6),
-                                      blurRadius: 20,
+                                      blurRadius: 3,
                                       spreadRadius: 5,
                                     ),
                                   ],
@@ -1025,8 +1025,8 @@ Widget ambulanceMap(
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.blue.withOpacity(0.8),
-                                    blurRadius: 20,
+                                    color: Colors.blue.withOpacity(0.6),
+                                    blurRadius: 3,
                                     spreadRadius: 5,
                                   ),
                                 ],

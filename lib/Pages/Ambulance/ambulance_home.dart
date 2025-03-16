@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:emergency_vehicle/Pages/Ambulance/ambulance_Drawer.dart';
+import 'package:emergency_vehicle/Pages/Ambulance/view_hospital_message_ambulanced.dart';
 import 'package:emergency_vehicle/widgets/map_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -367,172 +368,155 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
         : Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
-              title: const Text(
-                "Ambulance Home",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              title: const Center(
+                child: Text(
+                  "Ambulance",
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
               ),
-              backgroundColor: Colors.white,
+              foregroundColor: Colors.white,
+              backgroundColor: const Color(0xFF4A90E2),
               elevation: 0,
               actions: [
                 IconButton(
-                  icon:
-                      const Icon(Icons.notifications, color: Colors.redAccent),
-                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.notifications,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const ViewAmbulanceMessgaepagePage(title: ''),
+                        ));
+                  },
                 ),
               ],
             ),
             drawer: const AmbulanceDrawer(),
-            body: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Center(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: DropdownButton<String>(
-                          value: selectedItem,
-                          hint: const Text('Select Availability'),
-                          items: items.map((String item) {
-                            return DropdownMenuItem<String>(
-                              value: item,
-                              child: Text(item),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedItem = newValue;
-                              updateStatus(selectedItem.toString());
-                            });
-                          },
-                          icon: const Icon(Icons.arrow_drop_down_circle,
-                              color: Colors.blue),
-                          dropdownColor: Colors.white,
-                          style: const TextStyle(
-                              color: Colors.black, fontSize: 18),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      Container(
-                        height: MediaQuery.of(context).size.height * 0.4,
-                        margin: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[100],
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 5,
-                              spreadRadius: 1,
-                              offset: const Offset(0, 3),
+            body: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFF4A90E2), Color(0xFF145DA0)],
+                ),
+              ),
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: Container(
+                            height: MediaQuery.of(context).size.height * 0.4,
+                            decoration: BoxDecoration(
+                              color: const Color.fromARGB(255, 116, 175, 241),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 5,
+                                  spreadRadius: 1,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                        child: isLoading
-                            ? const Center(child: CircularProgressIndicator())
-                            : requests.isEmpty
+                            child: isLoading
                                 ? const Center(
-                                    child: Text(
-                                      'No requests available',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                  )
-                                : ListView.builder(
-                                    padding: const EdgeInsets.all(8),
-                                    itemCount: requests.length,
-                                    itemBuilder: (context, index) {
-                                      final request = requests[index];
-                                      final isSelected = selectedIndex == index;
-                                      final status = request['Status'];
+                                    child: CircularProgressIndicator())
+                                : requests.isEmpty
+                                    ? const Center(
+                                        child: Text(
+                                          'No requests available',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      )
+                                    : Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: ListView.builder(
+                                          padding: const EdgeInsets.all(8),
+                                          itemCount: requests.length,
+                                          itemBuilder: (context, index) {
+                                            final request = requests[index];
+                                            final isSelected =
+                                                selectedIndex == index;
+                                            final status = request['Status'];
 
-                                      return GestureDetector(
-                                        onTap: () {
-                                          setState(() => selectedIndex = index);
-                                          LatLng destination = LatLng(
-                                            double.parse(request['latitude']),
-                                            double.parse(request['longitude']),
-                                          );
-                                          fetchRoute(
-                                              currentLocation, destination);
-                                        },
-                                        child: AnimatedContainer(
-                                          duration:
-                                              const Duration(milliseconds: 300),
-                                          margin: const EdgeInsets.symmetric(
-                                              vertical: 6),
-                                          padding: const EdgeInsets.all(12),
-                                          decoration: BoxDecoration(
-                                            color: isSelected
-                                                ? Colors.blue[50]
-                                                : Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            boxShadow: [
-                                              if (isSelected)
-                                                BoxShadow(
-                                                  color: Colors.blue
-                                                      .withOpacity(0.3),
-                                                  blurRadius: 8,
-                                                  spreadRadius: 2,
-                                                )
-                                            ],
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              // Status Icon
-                                              Container(
+                                            return GestureDetector(
+                                              onTap: () {
+                                                setState(() =>
+                                                    selectedIndex = index);
+                                                LatLng destination = LatLng(
+                                                  double.parse(
+                                                      request['latitude']),
+                                                  double.parse(
+                                                      request['longitude']),
+                                                );
+                                                fetchRoute(currentLocation,
+                                                    destination);
+                                              },
+                                              child: AnimatedContainer(
+                                                duration: const Duration(
+                                                    milliseconds: 300),
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 6),
                                                 padding:
-                                                    const EdgeInsets.all(10),
+                                                    const EdgeInsets.all(12),
                                                 decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: status == 'Requested'
-                                                      ? Colors.orange
-                                                          .withOpacity(0.2)
-                                                      : status.startsWith(
-                                                              'Accepted')
-                                                          ? Colors.blue
-                                                              .withOpacity(0.2)
-                                                          : Colors.green
-                                                              .withOpacity(0.2),
+                                                  color: isSelected
+                                                      ? Colors.blue[50]
+                                                      : Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  boxShadow: [
+                                                    if (isSelected)
+                                                      BoxShadow(
+                                                        color: Colors.blue
+                                                            .withOpacity(0.3),
+                                                        blurRadius: 8,
+                                                        spreadRadius: 2,
+                                                      )
+                                                  ],
                                                 ),
-                                                child: Icon(
-                                                  status == 'Requested'
-                                                      ? Icons.access_time
-                                                      : status.startsWith(
-                                                              'Accepted')
-                                                          ? Icons
-                                                              .check_circle_outline
-                                                          : Icons.check_circle,
-                                                  color: status == 'Requested'
-                                                      ? Colors.orange
-                                                      : status.startsWith(
-                                                              'Accepted')
-                                                          ? Colors.blue
-                                                          : Colors.green,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 12),
-
-                                              // Request Details
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
+                                                child: Row(
                                                   children: [
-                                                    Text(
-                                                      request['request'],
-                                                      style: const TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.w600,
+                                                    // Status Icon
+                                                    Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10),
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: status ==
+                                                                'Requested'
+                                                            ? Colors.orange
+                                                                .withOpacity(
+                                                                    0.2)
+                                                            : status.startsWith(
+                                                                    'Accepted')
+                                                                ? Colors.blue
+                                                                    .withOpacity(
+                                                                        0.2)
+                                                                : Colors.green
+                                                                    .withOpacity(
+                                                                        0.2),
                                                       ),
-                                                    ),
-                                                    const SizedBox(height: 4),
-                                                    Text(
-                                                      'Status: ${request['Status']}',
-                                                      style: TextStyle(
+                                                      child: Icon(
+                                                        status == 'Requested'
+                                                            ? Icons.access_time
+                                                            : status.startsWith(
+                                                                    'Accepted')
+                                                                ? Icons
+                                                                    .check_circle_outline
+                                                                : Icons
+                                                                    .check_circle,
                                                         color: status ==
                                                                 'Requested'
                                                             ? Colors.orange
@@ -540,104 +524,270 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                                                                     'Accepted')
                                                                 ? Colors.blue
                                                                 : Colors.green,
-                                                        fontWeight:
-                                                            FontWeight.w500,
                                                       ),
                                                     ),
-                                                    Text(
-                                                      'Date: ${request['date']}',
-                                                      style: TextStyle(
-                                                        color: Colors.grey[600],
-                                                        fontSize: 13,
+                                                    const SizedBox(width: 12),
+
+                                                    // Request Details
+                                                    Expanded(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            request['request'],
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              height: 4),
+                                                          Text(
+                                                            'Status: ${request['Status']}',
+                                                            style: TextStyle(
+                                                              color: status ==
+                                                                      'Requested'
+                                                                  ? Colors
+                                                                      .orange
+                                                                  : status.startsWith(
+                                                                          'Accepted')
+                                                                      ? Colors
+                                                                          .blue
+                                                                      : Colors
+                                                                          .green,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
+                                                          ),
+                                                          // Text(
+                                                          //   'Date: ${request['date']}',
+                                                          //   style: TextStyle(
+                                                          //     color: Colors
+                                                          //         .grey[600],
+                                                          //     fontSize: 13,
+                                                          //   ),
+                                                          // ),
+                                                        ],
                                                       ),
                                                     ),
+
+                                                    // Action Buttons
+                                                    if (status == 'Requested')
+                                                      OutlinedButton(
+                                                        onPressed: () =>
+                                                            acceptRequest(
+                                                                request['id']),
+                                                        style: OutlinedButton
+                                                            .styleFrom(
+                                                          foregroundColor:
+                                                              Colors.blue,
+                                                          side:
+                                                              const BorderSide(
+                                                                  color: Colors
+                                                                      .blue),
+                                                        ),
+                                                        child: const Text(
+                                                            'Accept'),
+                                                      )
+                                                    else if (status
+                                                        .startsWith('Accepted'))
+                                                      Column(
+                                                        children: [
+                                                          const Icon(
+                                                              Icons
+                                                                  .check_circle,
+                                                              color:
+                                                                  Colors.blue),
+                                                          const SizedBox(
+                                                              height: 6),
+                                                          OutlinedButton(
+                                                            onPressed: () =>
+                                                                completeRequest(
+                                                                    request[
+                                                                        'id']),
+                                                            style:
+                                                                OutlinedButton
+                                                                    .styleFrom(
+                                                              foregroundColor:
+                                                                  Colors.green,
+                                                              side: const BorderSide(
+                                                                  color: Colors
+                                                                      .green),
+                                                            ),
+                                                            child: const Text(
+                                                                'Complete'),
+                                                          ),
+                                                        ],
+                                                      )
+                                                    else
+                                                      Row(
+                                                        children: [
+                                                          const Icon(
+                                                              Icons
+                                                                  .check_circle,
+                                                              color:
+                                                                  Colors.green),
+                                                          const SizedBox(
+                                                              width: 8),
+                                                          IconButton(
+                                                            icon: const Icon(
+                                                                Icons.delete,
+                                                                color:
+                                                                    Colors.red),
+                                                            onPressed: () =>
+                                                                deleteRequest(
+                                                                    request[
+                                                                        'id']),
+                                                          ),
+                                                        ],
+                                                      ),
                                                   ],
                                                 ),
                                               ),
-
-                                              // Action Buttons
-                                              if (status == 'Requested')
-                                                OutlinedButton(
-                                                  onPressed: () =>
-                                                      acceptRequest(
-                                                          request['id']),
-                                                  style:
-                                                      OutlinedButton.styleFrom(
-                                                    foregroundColor:
-                                                        Colors.blue,
-                                                    side: const BorderSide(
-                                                        color: Colors.blue),
-                                                  ),
-                                                  child: const Text('Accept'),
-                                                )
-                                              else if (status
-                                                  .startsWith('Accepted'))
-                                                Column(
-                                                  children: [
-                                                    const Icon(
-                                                        Icons.check_circle,
-                                                        color: Colors.blue),
-                                                    const SizedBox(height: 6),
-                                                    OutlinedButton(
-                                                      onPressed: () =>
-                                                          completeRequest(
-                                                              request['id']),
-                                                      style: OutlinedButton
-                                                          .styleFrom(
-                                                        foregroundColor:
-                                                            Colors.green,
-                                                        side: const BorderSide(
-                                                            color:
-                                                                Colors.green),
-                                                      ),
-                                                      child: const Text(
-                                                          'Complete'),
-                                                    ),
-                                                  ],
-                                                )
-                                              else
-                                                Row(
-                                                  children: [
-                                                    const Icon(
-                                                        Icons.check_circle,
-                                                        color: Colors.green),
-                                                    const SizedBox(width: 8),
-                                                    IconButton(
-                                                      icon: const Icon(
-                                                          Icons.delete,
-                                                          color: Colors.red),
-                                                      onPressed: () =>
-                                                          deleteRequest(
-                                                              request['id']),
-                                                    ),
-                                                  ],
+                                            );
+                                          },
+                                        ),
+                                      ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 10,
+                                spreadRadius: 2,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8.0, horizontal: 12),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    const Text(
+                                      "Change Status: ",
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    Center(
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 16, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          border: Border.all(
+                                            color: selectedItem == "Available"
+                                                ? Colors.green
+                                                : selectedItem == "Unavailable"
+                                                    ? Colors.red
+                                                    : Colors.blue,
+                                            width: 1.5,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  (selectedItem == "Available"
+                                                          ? Colors.green
+                                                          : selectedItem ==
+                                                                  "Unavailable"
+                                                              ? Colors.red
+                                                              : Colors.blue)
+                                                      .withOpacity(0.2),
+                                              blurRadius: 6,
+                                              spreadRadius: 2,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: DropdownButtonHideUnderline(
+                                          child: DropdownButton<String>(
+                                            value: selectedItem,
+                                            hint: const Text(
+                                              'Select Availability',
+                                              style: TextStyle(
+                                                  color: Colors.blueGrey,
+                                                  fontSize: 16),
+                                            ),
+                                            items: items.map((String item) {
+                                              return DropdownMenuItem<String>(
+                                                value: item,
+                                                child: Text(
+                                                  item,
+                                                  style: const TextStyle(
+                                                      fontSize: 16,
+                                                      color: Colors.black),
                                                 ),
-                                            ],
+                                              );
+                                            }).toList(),
+                                            onChanged: (String? newValue) {
+                                              setState(() {
+                                                selectedItem = newValue;
+                                                updateStatus(
+                                                    selectedItem.toString());
+                                              });
+                                            },
+                                            icon: const Icon(
+                                                Icons.keyboard_arrow_down,
+                                                color: Colors.blue,
+                                                size: 28),
+                                            dropdownColor: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(12),
                                           ),
                                         ),
-                                      );
-                                    },
-                                  ),
-                      ),
-                      Expanded(
-                        child: ambulanceMap(fetchAmbulanceRequests(),
-                            routeCoordinates: routeCoordinates,
-                            fetchRoute: fetchRoute,
-                            onMarkerTap: _onMarkerTap,
-                            selectedIndex: selectedIndex,
-                            currentLocation: currentLocation,
-                            ambulanceRequests: requests,
-                            getcurrentLocation: _getCurrentLocationRequests(),
-                            height: screenheight * 0.3,
-                            width: screenwidth,
-                            mapController: _mapController,
-                            context: context,
-                            isFullScreen: _isFullScreen,
-                            toggleFullScreen: _toggleFullScreen,
-                            ishelp: _isHelp,
-                            toggleHelp: _toggleHelp),
-                      ),
-                    ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Expanded(
+                                    child: ambulanceMap(
+                                        fetchAmbulanceRequests(),
+                                        routeCoordinates: routeCoordinates,
+                                        fetchRoute: fetchRoute,
+                                        onMarkerTap: _onMarkerTap,
+                                        selectedIndex: selectedIndex,
+                                        currentLocation: currentLocation,
+                                        ambulanceRequests: requests,
+                                        getcurrentLocation:
+                                            _getCurrentLocationRequests(),
+                                        height: screenheight * 0.3,
+                                        width: screenwidth,
+                                        mapController: _mapController,
+                                        context: context,
+                                        isFullScreen: _isFullScreen,
+                                        toggleFullScreen: _toggleFullScreen,
+                                        ishelp: _isHelp,
+                                        toggleHelp: _toggleHelp),
+                                  )),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
