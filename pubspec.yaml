@@ -46,6 +46,7 @@ dependencies:
   flutter_map: ^7.0.2
   latlong2: ^0.9.1
   flutter_local_notifications: ^18.0.1
+  flutter_sound: ^9.25.9
 
   # sensors:
 dev_dependencies:
