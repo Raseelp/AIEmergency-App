@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui';
 import 'package:emergency_vehicle/Pages/User/Viewtrafficnoti.dart';
 import 'package:emergency_vehicle/Pages/models/ambulance_mode.dart';
 import 'package:emergency_vehicle/widgets/map_widgets.dart';
@@ -402,8 +403,7 @@ class _HomeState extends State<Home> {
                       // SOS Button with Shadow
                       GestureDetector(
                         onTap: () {
-                          _getCurrentLocation();
-                          sendSOSRequest();
+                          _showConfirmationDialog(context);
                         },
                         child: Padding(
                           padding: EdgeInsets.only(bottom: screenheight * 0.05),
@@ -530,8 +530,81 @@ class _HomeState extends State<Home> {
           );
   }
 
+  void _showConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0), // Rounded corners
+            ),
+            backgroundColor: const Color(0xFF4A90E2),
+            title: const Row(
+              children: [
+                Icon(Icons.warning, color: Colors.white),
+                SizedBox(width: 10),
+                Text(
+                  "Confirm SOS Request",
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+            content: const Text(
+              "This button press will call the ambulance service to your current location. Do you really want to continue?",
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+                child: const Text(
+                  "Cancel",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _getCurrentLocation();
+                  sendSOSRequest();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                ),
+                child: const Text(
+                  "Confirm",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> loadnot() async {
-    print("object");
     SharedPreferences sh = await SharedPreferences.getInstance();
     String? url = sh.getString('url');
 
