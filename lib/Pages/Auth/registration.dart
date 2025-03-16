@@ -32,257 +32,190 @@ class _RegistrationState extends State<Registration> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: const Text("Emergency"),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF4A90E2), Color(0xFF145DA0)],
+          ),
         ),
-        body: SafeArea(
-            child: Form(
-                key: _formKey,
+        child: SafeArea(
+          child: Column(
+            children: [
+              AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                centerTitle: true,
+              ),
+              Expanded(
                 child: SingleChildScrollView(
-                    child: Column(children: [
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        "Register",
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.local_hospital,
+                          size: 80, color: Colors.white),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "Welcome!",
                         style: TextStyle(
-                          fontSize: 25,
+                          fontSize: 26,
                           fontWeight: FontWeight.bold,
-                          color: Colors.blue,
+                          color: Colors.white,
                         ),
                       ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      controller: fnameController,
-                      decoration: const InputDecoration(
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(),
-                        hintText: "First Name",
+                      const SizedBox(height: 8),
+                      const Text(
+                        "Enter Your Details to continue",
+                        style: TextStyle(fontSize: 16, color: Colors.white70),
                       ),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Please enter your first name';
-                        }
-                        return null; // Return null if the input is valid
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      controller: placeController,
-                      decoration: const InputDecoration(
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(),
-                        hintText: "place",
-                      ),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Please enter your place';
-                        }
-                        return null; // Return null if the input is valid
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      controller: postController,
-                      decoration: const InputDecoration(
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(),
-                        hintText: "post",
-                      ),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Please enter your post';
-                        }
-                        return null; // Return null if the input is valid
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      controller: pinController,
-                      decoration: const InputDecoration(
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(),
-                        hintText: "pin",
-                      ),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Please enter your pin';
-                        }
-                        if (value.length < 6) {
-                          return 'Please enter a valid pin';
-                        }
-                        return null; // Return null if the input is valid
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      controller: phoneController,
-                      decoration: const InputDecoration(
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(),
-                        hintText: "Phone",
-                      ),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Please enter your phoneNumber';
-                        }
-                        if (value.length < 10) {
-                          return 'Phone number length must be Ten';
-                        }
-                        if (value.length > 10) {
-                          return 'Phone number length must be Ten';
-                        }
-                        if (value.contains(RegExp(r'[A-Z]'))) {
-                          return 'Phone Number Shouldnt contain letters';
-                        }
-                        if (value.contains(RegExp(r'[a-z]'))) {
-                          return 'Phone Number Shouldnt contain letters';
-                        }
-
-                        return null; // Return null if the input is valid
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      controller: emailController,
-                      decoration: const InputDecoration(
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(),
-                        hintText: "Email",
-                      ),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return '`Please enter your email address';
-                        }
-                        if (!value.contains('@')) {
-                          return 'Email must contain @';
-                        }
-                        if (!value.contains('.')) {
-                          return 'Email must contain .';
-                        }
-                        return null; // Return null if the input is valid
-                      },
-                    ),
-                  ),
-                  Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextFormField(
-                        controller: usernameController,
-                        decoration: const InputDecoration(
+                      const SizedBox(height: 30),
+                      const SizedBox(height: 15),
+                      TextFormField(
+                        controller: fnameController,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.person,
+                              color: Colors.blueAccent),
+                          filled: true,
                           fillColor: Colors.white,
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          hintText: "First Name",
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: phoneController,
+                        decoration: InputDecoration(
+                          prefixIcon:
+                              const Icon(Icons.phone, color: Colors.blueAccent),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          hintText: "Phone",
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: emailController,
+                        decoration: InputDecoration(
+                          prefixIcon:
+                              const Icon(Icons.email, color: Colors.blueAccent),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          hintText: "Email",
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: usernameController,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.person_2_outlined,
+                              color: Colors.blueAccent),
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                           hintText: "Username",
                         ),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter your username';
-                          }
-                          return null; // Return null if the input is valid
-                        },
-                      )),
-                  Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextFormField(
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
                         controller: passwordController,
-                        decoration: const InputDecoration(
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.password,
+                              color: Colors.blueAccent),
+                          filled: true,
                           fillColor: Colors.white,
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                           hintText: "Password",
                         ),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter your password';
-                          }
-                          if (value.length < 8) {
-                            return 'Password must be at least 8 characters long';
-                          }
-
-                          return null; // Return null if the input is valid
-                        },
-                      )),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton.icon(
-                      onPressed: () async {
-                        if (!_formKey.currentState!.validate()) {
-                        } else {
-                          final sh = await SharedPreferences.getInstance();
-                          String fname = fnameController.text.toString();
-                          // String lname = lnameController.text.toString();
-                          String place = placeController.text.toString();
-                          String post = postController.text.toString();
-                          String pin = pinController.text.toString();
-                          String phone = phoneController.text.toString();
-                          String email = emailController.text.toString();
-                          String uname = usernameController.text.toString();
-                          String pasword = passwordController.text.toString();
-
-                          String url = sh.getString("url").toString();
-                          print("okkkkkkkkkkkkkkkkk");
-                          var data = await http.post(
-                              Uri.parse(url + "user_registration"),
-                              body: {
-                                'fname': fname,
-                                // 'lname': lname,
-                                'place': place,
-                                'post': post,
-                                'pin': pin,
-                                'phone': phone,
-                                'email': email,
-                                'uname': uname,
-                                'password': pasword,
-                                'lid': sh.getString("lid").toString(),
-                              });
-                          var jasondata = json.decode(data.body);
-                          String status = jasondata['task'].toString();
-                          print(status);
-                          if (status == "valid") {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                    "Registration Successful! You can now log in."),
-                                backgroundColor: Colors.green,
-                                duration: Duration(seconds: 2),
-                              ),
-                            );
-
-                            Future.delayed(const Duration(seconds: 1), () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => login()),
-                              );
-                            });
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          if (!_formKey.currentState!.validate()) {
                           } else {
-                            print("error");
+                            final sh = await SharedPreferences.getInstance();
+                            String fname = fnameController.text.toString();
+
+                            String phone = phoneController.text.toString();
+                            String email = emailController.text.toString();
+                            String uname = usernameController.text.toString();
+                            String pasword = passwordController.text.toString();
+
+                            String url = sh.getString("url").toString();
+                            print("okkkkkkkkkkkkkkkkk");
+                            var data = await http.post(
+                                Uri.parse(url + "user_registration"),
+                                body: {
+                                  'fname': fname,
+                                  'phone': phone,
+                                  'email': email,
+                                  'uname': uname,
+                                  'password': pasword,
+                                  'lid': sh.getString("lid").toString(),
+                                });
+                            var jasondata = json.decode(data.body);
+                            String status = jasondata['task'].toString();
+                            print(status);
+                            if (status == "valid") {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      "Registration Successful! You can now log in."),
+                                  backgroundColor: Colors.green,
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+
+                              Future.delayed(const Duration(seconds: 1), () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => login()),
+                                );
+                              });
+                            } else {
+                              print("error");
+                            }
                           }
-                        }
-                      },
-                      icon: const Icon(Icons.send),
-                      label: const Text('Submit'),
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                          Color(
-                              0xFF6ADC50), // Use a proper color value (e.g., Hex or RGB)
+                        },
+                        icon: const Icon(Icons.send, color: Colors.white),
+                        label: const Text(
+                          'Submit',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 12, horizontal: 24),
                         ),
                       ),
-                    ),
-                  )
-                ])))));
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
