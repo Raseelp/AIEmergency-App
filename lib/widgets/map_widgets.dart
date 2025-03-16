@@ -181,8 +181,8 @@ Widget userMap(
                                                     'Available'
                                                 ? Colors.green.withOpacity(0.6)
                                                 : Colors.red.withOpacity(0.6),
-                                            blurRadius: 20,
-                                            spreadRadius: 5,
+                                            blurRadius: 5,
+                                            spreadRadius: 2,
                                           ),
                                         ],
                                       ),
@@ -473,8 +473,8 @@ Widget userMap(
                                                     'Available'
                                                 ? Colors.green.withOpacity(0.6)
                                                 : Colors.red.withOpacity(0.6),
-                                            blurRadius: 20,
-                                            spreadRadius: 5,
+                                            blurRadius: 5,
+                                            spreadRadius: 2,
                                           ),
                                         ],
                                       ),

@@ -11,20 +11,19 @@ class AmbulanceDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            width: double.infinity,
-            // decoration: const BoxDecoration(
-            //   gradient: LinearGradient(
-            //     colors: [Colors.blueAccent, Colors.lightBlueAccent],
-            //     begin: Alignment.topLeft,
-            //     end: Alignment.bottomRight,
-            //   ),
-            // ),
-            child: const Column(
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blueAccent, Colors.lightBlueAccent],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Column(
+          children: [
+            const Column(
               children: [
+                SizedBox(height: 20),
                 CircleAvatar(
                   radius: 40,
                   backgroundColor: Colors.white,
@@ -45,30 +44,31 @@ class AmbulanceDrawer extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(12),
-              children: [
-                _buildDrawerItem(
-                    context, Icons.home, "Home", const AmbulanceHome()),
-                _buildDrawerItem(
-                  context,
-                  Icons.local_hospital,
-                  "View Messages From Hospital",
-                  const ViewAmbulanceMessgaepagePage(title: ''),
-                ),
-                _buildDrawerItem(context, Icons.notification_important,
-                    "Send Patient Info", SendPatientInfo()),
-                _buildDrawerItem(context, Icons.update,
-                    "Ambulance Location Updation", SendFeedback()),
-                const Divider(),
-                _buildDrawerItem(context, Icons.logout, "Logout", const login(),
-                    isLogout: true),
-              ],
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.all(12),
+                children: [
+                  _buildDrawerItem(
+                      context, Icons.home, "Home", const AmbulanceHome()),
+                  _buildDrawerItem(
+                    context,
+                    Icons.local_hospital,
+                    "View Messages From Hospital",
+                    const ViewAmbulanceMessgaepagePage(title: ''),
+                  ),
+                  _buildDrawerItem(context, Icons.notification_important,
+                      "Send Patient Info", SendPatientInfo()),
+                  _buildDrawerItem(context, Icons.update,
+                      "Ambulance Location Updation", SendFeedback()),
+                  const Divider(),
+                  _buildDrawerItem(
+                      context, Icons.logout, "Logout", const login(),
+                      isLogout: true),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

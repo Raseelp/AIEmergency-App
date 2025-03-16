@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:emergency_vehicle/Pages/User/Viewtrafficnoti.dart';
 import 'package:emergency_vehicle/Pages/models/ambulance_mode.dart';
 import 'package:emergency_vehicle/widgets/map_widgets.dart';
 import 'package:flutter/material.dart';
@@ -274,160 +275,261 @@ class _HomeState extends State<Home> {
                 : const Center(child: CircularProgressIndicator()),
           )
         : Scaffold(
-            backgroundColor: Colors.white,
+            backgroundColor: const Color(0xFF4A90E2),
             appBar: AppBar(
-              backgroundColor: Colors.white,
+              foregroundColor: Colors.white,
+              backgroundColor: const Color(0xFF4A90E2),
               elevation: 0,
               title: const Text(
                 "Emergency SOS",
                 style: TextStyle(
-                    color: Colors.black,
+                    color: Colors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.bold),
               ),
               centerTitle: true,
               actions: [
                 IconButton(
-                  icon:
-                      const Icon(Icons.notifications, color: Colors.redAccent),
-                  onPressed: () {},
+                  icon: const Icon(Icons.notifications, color: Colors.white),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ViewNearestNotification(),
+                        ));
+                  },
                 ),
               ],
             ),
             drawer: const UserDrawer(),
-            body: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            spreadRadius: 2,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "Welcome back,",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              Text(
-                                username,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                          CircleAvatar(
-                            radius: 25,
-                            backgroundColor: Colors.grey[200],
-                            child: const Icon(
-                              Icons.person,
-                              size: 30,
-                              color: Colors.black54, // Subtle contrast
+            body: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFF4A90E2), Color(0xFF145DA0)],
+                ),
+              ),
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              spreadRadius: 2,
+                              offset: const Offset(0, 5),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 30),
-
-                    // Emergency Message
-                    const Text(
-                      "Are you in emergency?",
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      "Press the button below, help will reach you soon.",
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 40),
-
-                    // SOS Button with Shadow
-                    GestureDetector(
-                      onTap: () {
-                        _getCurrentLocation();
-                        sendSOSRequest();
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.only(bottom: screenheight * 0.05),
-                        child: Stack(
-                          alignment: Alignment.center,
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Container(
-                              width: 160,
-                              height: 160,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: const LinearGradient(
-                                  colors: [Colors.redAccent, Colors.deepOrange],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.redAccent.withOpacity(0.5),
-                                    blurRadius: 40,
-                                    spreadRadius: 10,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Need Medical Help?",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
                                   ),
-                                ],
-                              ),
+                                ),
+                                const SizedBox(height: 4),
+                                const Text(
+                                  "Ask our AI Chatbot",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                ElevatedButton.icon(
+                                  onPressed: () {},
+                                  icon: const Icon(Icons.chat_bubble_outline,
+                                      color: Colors.white),
+                                  label: const Text(
+                                    "Go to Chatbot",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blueAccent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 8),
+                                  ),
+                                ),
+                              ],
                             ),
-                            Container(
-                              width: 120,
-                              height: 120,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.redAccent,
-                              ),
-                              child: const Center(
-                                child: FaIcon(FontAwesomeIcons.ambulance,
-                                    color: Colors.white, size: 50),
+                            CircleAvatar(
+                              radius: 25,
+                              backgroundColor: Colors.blue[
+                                  100], // Light blue background for chatbot icon
+                              child: const Icon(
+                                Icons.medical_services,
+                                size: 30,
+                                color: Colors.blueAccent,
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                    _isMapReady
-                        ? userMap(fetchedAmbulances, fetchAmbulances(),
-                            context: context,
-                            getcurrentLocation: _getCurrentLocation(),
-                            height: screenheight * 0.3,
-                            width: screenwidth * 0.8,
-                            mapController: _mapController,
-                            currentLocation: currentLocation,
-                            isFullScreen: _isFullScreen,
-                            toggleFullScreen: _toggleFullScreen,
-                            ishelp: _isHelp,
-                            toggleHelp: _toggleHelp)
-                        : const Center(child: CircularProgressIndicator()),
-                  ],
+
+                      const SizedBox(height: 30),
+
+                      // Emergency Message
+                      const Text(
+                        "Are you in emergency?",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        "Press the button below, help will reach you soon.",
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 40),
+
+                      // SOS Button with Shadow
+                      GestureDetector(
+                        onTap: () {
+                          _getCurrentLocation();
+                          sendSOSRequest();
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.only(bottom: screenheight * 0.05),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                width: 160,
+                                height: 160,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Colors.redAccent,
+                                      Colors.deepOrange
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.redAccent.withOpacity(0.5),
+                                      blurRadius: 40,
+                                      spreadRadius: 10,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                width: 120,
+                                height: 120,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.redAccent,
+                                ),
+                                child: const Center(
+                                  child: FaIcon(FontAwesomeIcons.ambulance,
+                                      color: Colors.white, size: 50),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      _isMapReady
+                          ? Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 10,
+                                    spreadRadius: 2,
+                                    offset: const Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0, horizontal: 12),
+                                    child: Row(
+                                      children: [
+                                        const Text(
+                                          "Track Live",
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                            width:
+                                                8), // Spacing between text and circle
+                                        Container(
+                                          width: 10, // Small circular size
+                                          height: 10,
+                                          decoration: BoxDecoration(
+                                            color: Colors.red, // Red color
+                                            shape: BoxShape.circle,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.red.withOpacity(
+                                                    0.6), // Glowing red
+                                                blurRadius: 8,
+                                                spreadRadius: 3,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: userMap(
+                                      fetchedAmbulances,
+                                      fetchAmbulances(),
+                                      context: context,
+                                      getcurrentLocation: _getCurrentLocation(),
+                                      height: screenheight * 0.25,
+                                      width: screenwidth * 0.8,
+                                      mapController: _mapController,
+                                      currentLocation: currentLocation,
+                                      isFullScreen: _isFullScreen,
+                                      toggleFullScreen: _toggleFullScreen,
+                                      ishelp: _isHelp,
+                                      toggleHelp: _toggleHelp,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : const Center(child: CircularProgressIndicator()),
+                    ],
+                  ),
                 ),
               ),
             ),
