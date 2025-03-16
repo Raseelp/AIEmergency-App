@@ -141,8 +141,7 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
     if (lid != null) {
       try {
         final response = await http.post(
-          Uri.parse(url! +
-              'get_ambulance_requests/'), // Replace with your backend URL
+          Uri.parse(url! + 'get_ambulance_requests/'),
           headers: {"Content-Type": "application/json"},
           body: jsonEncode({'lid': lid}),
         );
@@ -532,7 +531,9 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                                                                 .start,
                                                         children: [
                                                           Text(
-                                                            request['request'],
+                                                            'Sent By ' +
+                                                                request[
+                                                                    'username'],
                                                             style:
                                                                 const TextStyle(
                                                               fontSize: 16,
@@ -561,14 +562,6 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                                                                       .w500,
                                                             ),
                                                           ),
-                                                          // Text(
-                                                          //   'Date: ${request['date']}',
-                                                          //   style: TextStyle(
-                                                          //     color: Colors
-                                                          //         .grey[600],
-                                                          //     fontSize: 13,
-                                                          //   ),
-                                                          // ),
                                                         ],
                                                       ),
                                                     ),
@@ -655,7 +648,7 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: const Color.fromARGB(255, 255, 255, 255),
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
