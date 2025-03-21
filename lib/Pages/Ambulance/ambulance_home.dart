@@ -105,7 +105,7 @@ class _AmbulanceHomeState extends State<AmbulanceHome> {
         }
       }
 
-      if (permission == LocationPermission.deniedForever) {
+      if(permission == LocationPermission.deniedForever){
         setState(() {
           _currentLocationStatus =
               'Location permissions are permanently denied';

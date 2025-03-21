@@ -615,23 +615,21 @@ class _HomeState extends State<Home> {
     }
 
     final response = await http.post(
-        Uri.parse(url! + 'view_nearest_ambulances2'),
-        body: {'id': storedstring});
-    print(url! + 'view_nearest_ambulances2');
+        Uri.parse(url! + 'receive_user_location/'),
+        body: {'latitude': _latitude.toString(),'longitude':_longitude.toString()});
+    print(url! + 'receive_user_location/');
+    print(_latitude.toString());
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
-      if (data['status'] == 'ok') {
-        String id = data['id'].toString();
-
-        sh.setString("id", id);
+      if (data['task'] == 'ok') {
         await showNotification(" Emergency.... Ambulance Passing!",
             "An ambulance is in your area. Move aside and make way immediately to assist in this emergency.");
       } else {
-        throw Exception('Failed to load ambulances: ${data['status']}');
+        throw Exception('Failed to load ambulances: ${data['task']}${data['message']}');
       }
     } else {
-      throw Exception('Failed to load ambulances');
+      // throw Exception('Failed to load ambulances');
     }
   }
 }
