@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 import 'package:emergency_vehicle/Pages/User/Viewtrafficnoti.dart';
+import 'package:emergency_vehicle/Pages/User/chatbot.dart';
 import 'package:emergency_vehicle/Pages/models/ambulance_mode.dart';
 import 'package:emergency_vehicle/widgets/map_widgets.dart';
 import 'package:flutter/material.dart';
@@ -75,15 +76,26 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> showNotification(String title, String body) async {
-    const AndroidNotificationDetails androidDetails =
-        AndroidNotificationDetails(
+    AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'ambulance_channel_id',
       'Ambulance Notifications',
-      importance: Importance.high,
+      importance: Importance.max,
       priority: Priority.high,
+      styleInformation: BigTextStyleInformation(
+        body,
+        contentTitle: title,
+        summaryText: 'Emergency Alert!',
+        htmlFormatContent: true,
+        htmlFormatContentTitle: true,
+      ),
+      playSound: true,
+      sound: const RawResourceAndroidNotificationSound(
+          'sound'), // Custom sound file name (without extension)
+      enableVibration: true,
+      ticker: 'Emergency Notification',
     );
 
-    const NotificationDetails platformDetails =
+    NotificationDetails platformDetails =
         NotificationDetails(android: androidDetails);
 
     await flutterLocalNotificationsPlugin.show(
@@ -147,14 +159,14 @@ class _HomeState extends State<Home> {
     }
   }
 
-  Future<void> sendSOSRequest() async {
+  Future<bool> sendSOSRequest({bool bypassProximityCheck = false}) async {
     SharedPreferences sh = await SharedPreferences.getInstance();
     String? url = sh.getString('url');
     String? lid = sh.getString('lid');
 
     if (url == null || lid == null || url.isEmpty || lid.isEmpty) {
       Fluttertoast.showToast(msg: 'Invalid URL or ID');
-      return;
+      return false;
     }
 
     // Ensure the URL has a trailing slash
@@ -169,17 +181,50 @@ class _HomeState extends State<Home> {
         'lid': lid,
         'latitude': _latitude.toString(),
         'longitude': _longitude.toString(),
+        'bypass':
+            bypassProximityCheck ? 'true' : 'false', // New field for bypass
       });
       if (response.statusCode == 200) {
         String status = jsonDecode(response.body)['status'];
+        print(status + '+=++++++++++++++++++++++++++++++++++++');
+        if (!bypassProximityCheck && status == 'close') {
+          bool userConfirmation = await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text("Nearby Request Detected"),
+              content: const Text(
+                  "There is an existing request nearby. Are you sure you want to proceed?"),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    await sendSOSRequest(bypassProximityCheck: true);
+                    Navigator.pop(context, true);
+                    Fluttertoast.showToast(
+                        msg: 'Network Error (Status: ${response.statusCode})');
+                  },
+                  child: const Text("Proceed"),
+                ),
+              ],
+            ),
+          );
+
+          return userConfirmation;
+        }
         Fluttertoast.showToast(
             msg: status == 'ok' ? 'Request Sent' : 'Already Sent!');
+        return status == 'ok';
       } else {
         Fluttertoast.showToast(
             msg: 'Network Error (Status: ${response.statusCode})');
+        return false;
       }
     } catch (e) {
       Fluttertoast.showToast(msg: 'Request Failed: $e');
+      return false;
     }
   }
 
@@ -349,7 +394,14 @@ class _HomeState extends State<Home> {
                                 ),
                                 const SizedBox(height: 8),
                                 ElevatedButton.icon(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              MedicalChatbot(),
+                                        ));
+                                  },
                                   icon: const Icon(Icons.chat_bubble_outline,
                                       color: Colors.white),
                                   label: const Text(
@@ -605,20 +657,15 @@ class _HomeState extends State<Home> {
   Future<void> loadnot() async {
     SharedPreferences sh = await SharedPreferences.getInstance();
     String? url = sh.getString('url');
-    String? storedstring = sh.getString("id");
-    print(storedstring);
 
-    if (storedstring == null || storedstring.isEmpty) {
-      print("Error: No valid ID stored in SharedPreferences");
-      sh.setString('id', '9');
-      return;
-    }
-
-    final response = await http.post(
-        Uri.parse(url! + 'receive_user_location/'),
-        body: {'latitude': _latitude.toString(),'longitude':_longitude.toString()});
+    final response = await http.post(Uri.parse(url! + 'receive_user_location/'),
+        body: {
+          'latitude': _latitude.toString(),
+          'longitude': _longitude.toString()
+        });
     print(url! + 'receive_user_location/');
     print(_latitude.toString());
+    print(_longitude.toString());
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
@@ -626,7 +673,8 @@ class _HomeState extends State<Home> {
         await showNotification(" Emergency.... Ambulance Passing!",
             "An ambulance is in your area. Move aside and make way immediately to assist in this emergency.");
       } else {
-        throw Exception('Failed to load ambulances: ${data['task']}${data['message']}');
+        throw Exception(
+            'Failed to load ambulances: ${data['task']}${data['message']}');
       }
     } else {
       // throw Exception('Failed to load ambulances');
