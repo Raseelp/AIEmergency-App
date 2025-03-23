@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,7 +13,10 @@ class MedicalChatbot extends StatefulWidget {
 
 class _MedicalChatbotState extends State<MedicalChatbot> {
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
   List<Map<String, String>> messages = [];
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -54,6 +58,7 @@ class _MedicalChatbotState extends State<MedicalChatbot> {
 
     setState(() {
       messages.add({"role": "user", "message": message});
+      isLoading = true;
     });
     await saveChatHistory();
 
@@ -74,6 +79,7 @@ class _MedicalChatbotState extends State<MedicalChatbot> {
         final responseData = json.decode(response.body);
         setState(() {
           messages.add({"role": "bot", "message": responseData["response"]});
+          isLoading = false;
         });
       } else {
         setState(() {
@@ -90,12 +96,61 @@ class _MedicalChatbotState extends State<MedicalChatbot> {
     await saveChatHistory();
   }
 
+  TextSpan formatMessage(String message) {
+    final RegExp boldPattern = RegExp(r'\*\*(.*?)\*\*');
+    List<TextSpan> spans = [];
+    int start = 0;
+
+    // Match all bold patterns
+    for (final match in boldPattern.allMatches(message)) {
+      // Normal text before the bold pattern
+      if (match.start > start) {
+        spans.add(TextSpan(
+          text: message.substring(start, match.start),
+          style: const TextStyle(color: Colors.black87),
+        ));
+      }
+
+      // Bold text
+      spans.add(TextSpan(
+        text: match.group(1),
+        style:
+            const TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
+      ));
+
+      start = match.end;
+    }
+
+    // Add remaining normal text
+    if (start < message.length) {
+      spans.add(TextSpan(
+        text: message.substring(start),
+        style: const TextStyle(color: Colors.black87),
+      ));
+    }
+
+    return TextSpan(children: spans);
+  }
+
+  void _scrollToBottom() {
+    Future.delayed(const Duration(milliseconds: 50), () {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text("Medical Chatbot"),
+        title: const Center(child: Text("Medical Chatbot")),
         backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.white,
         actions: [
@@ -111,112 +166,155 @@ class _MedicalChatbotState extends State<MedicalChatbot> {
           )
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Container(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 10.0, horizontal: 8.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 4,
-                    spreadRadius: 2,
-                    offset: Offset(0, 2),
-                  )
-                ],
-              ),
-              child: ListView.builder(
-                itemCount: messages.length,
-                itemBuilder: (context, index) {
-                  bool isUser = messages[index]["role"] == "user";
-                  return Container(
-                    margin: const EdgeInsets.symmetric(vertical: 6),
-                    child: Align(
-                      alignment:
-                          isUser ? Alignment.centerRight : Alignment.centerLeft,
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: isUser ? Colors.blueAccent : Colors.grey[300],
-                          borderRadius: BorderRadius.only(
-                            topLeft: const Radius.circular(12),
-                            topRight: const Radius.circular(12),
-                            bottomLeft: isUser
-                                ? const Radius.circular(12)
-                                : Radius.zero,
-                            bottomRight: isUser
-                                ? Radius.zero
-                                : const Radius.circular(12),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Expanded(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10.0, horizontal: 8.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 4,
+                      spreadRadius: 2,
+                      offset: Offset(0, 2),
+                    )
+                  ],
+                ),
+                child: ListView.builder(
+                  controller: _scrollController,
+                  itemCount: isLoading ? messages.length + 1 : messages.length,
+                  itemBuilder: (context, index) {
+                    if (isLoading && index == messages.length) {
+                      _scrollToBottom();
+
+                      return Container(
+                        margin: const EdgeInsets.symmetric(vertical: 6),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Container(
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                LoadingAnimationWidget.fourRotatingDots(
+                                  color: Colors.blueAccent,
+                                  size: 28,
+                                ),
+                                const SizedBox(width: 12),
+                                const Text(
+                                  "Anuuu is thinking...",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        child: Column(
-                          crossAxisAlignment: isUser
-                              ? CrossAxisAlignment.end
-                              : CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              isUser ? "You" : "Bot",
-                              style: TextStyle(
-                                color: isUser ? Colors.white70 : Colors.black54,
-                                fontSize: 12,
+                      );
+                    }
+                    bool isUser = messages[index]["role"] == "user";
+                    return Container(
+                      margin: const EdgeInsets.symmetric(vertical: 6),
+                      child: Align(
+                        alignment: isUser
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 5,
+                                offset: Offset(0, 0),
                               ),
+                            ],
+                            color:
+                                isUser ? Colors.blueAccent : Colors.grey[300],
+                            borderRadius: BorderRadius.only(
+                              topLeft: const Radius.circular(12),
+                              topRight: const Radius.circular(12),
+                              bottomLeft: isUser
+                                  ? const Radius.circular(12)
+                                  : Radius.zero,
+                              bottomRight: isUser
+                                  ? Radius.zero
+                                  : const Radius.circular(12),
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              messages[index]["message"]!,
-                              style: TextStyle(
-                                color: isUser ? Colors.white : Colors.black87,
-                                fontSize: 15,
-                              ),
-                            ),
-                          ],
+                          ),
+                          child: RichText(
+                            text: isUser
+                                ? TextSpan(
+                                    text: messages[index]["message"],
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 15),
+                                  )
+                                : formatMessage(messages[index]["message"]!),
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(
-                      hintText: "Ask a medical question...",
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: BorderSide.none,
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      decoration: InputDecoration(
+                        hintText: "Ask a medical question...",
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                FloatingActionButton(
-                  onPressed: () async {
-                    if (_controller.text.isNotEmpty) {
-                      await sendMessage(_controller.text);
-                      _controller.clear();
-                    }
-                  },
-                  backgroundColor: Colors.blueAccent,
-                  child: const Icon(Icons.send, color: Colors.white),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  FloatingActionButton(
+                    onPressed: () async {
+                      if (_controller.text.isNotEmpty) {
+                        _scrollToBottom();
+                        await sendMessage(_controller.text);
+
+                        _controller.clear();
+                      }
+                    },
+                    backgroundColor: Colors.blueAccent,
+                    child: const Icon(Icons.send, color: Colors.white),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
